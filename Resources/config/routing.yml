@@ -1,0 +1,3 @@
+hoya_masterpass_homepage:
+    path:     /hello/{name}
+    defaults: { _controller: HoyaMasterpassBundle:Default:index }

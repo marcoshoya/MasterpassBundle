@@ -1,0 +1,3 @@
+#Others
+*.php~
+/nbproject/*

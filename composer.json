@@ -1,0 +1,27 @@
+{
+   "name":"marcoshoya/masterpass-bundle",
+   "type": "library",
+   "description": "Masterpass V6 Bundle",
+   "keywords":[
+      "masterpass",
+      "mastercard",
+      "symfony"
+   ],
+   "license":"MIT",
+   "authors":[
+      {
+         "name":"Marcos Vinicius Joia Lazarin",
+         "email":"marcoshoya@gmail.com"
+      }
+   ],
+   "require":{
+      "php":">=5.4.0",
+      "symfony/framework-bundle":"2.*"
+   },
+   "target-dir": "Hoya/MasterpassBundle",
+   "autoload":{
+      "psr-0":{
+         "Hoya\\MasterpassBundle": ""
+      }
+   }
+}
