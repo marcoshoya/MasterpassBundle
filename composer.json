@@ -1,6 +1,6 @@
 {
    "name":"marcoshoya/masterpass-bundle",
-   "type": "library",
+   "type": "symfony-bundle",
    "description": "Masterpass V6 Bundle",
    "keywords":[
       "masterpass",
@@ -15,8 +15,8 @@
       }
    ],
    "require":{
-      "php":">=5.4.0",
-      "symfony/framework-bundle":"2.*"
+      "php": ">=5.4.0",
+      "symfony/framework-bundle": "~2.3|~3.0"
    },
    "target-dir": "Hoya/MasterpassBundle",
    "autoload":{
