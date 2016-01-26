@@ -1,1 +1,7 @@
-#services:
+services:
+    hoya_masterpass_connector:
+        class: Hoya\MasterpassBundle\Common\Connector
+        
+    hoya_masterpass_service:
+        class: Hoya\MasterpassBundle\Service\MasterpassService
+        parent: hoya_masterpass_connector
