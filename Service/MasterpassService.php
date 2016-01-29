@@ -135,13 +135,6 @@ class MasterpassService extends Connector
         return $response;
     }
 
-    public function postOpenFeed($openFeedUrl, $openFeedXml)
-    {
-        $response = $this->doRequest(array(), $openFeedUrl, Connector::POST, $openFeedXml);
-
-        return $response;
-    }
-
     /**
      * SDK:
      * This method retrieves the payment and shipping information

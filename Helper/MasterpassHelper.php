@@ -3,9 +3,9 @@
 namespace Hoya\MasterpassBundle\Helper;
 
 /**
- * Description of MasterpassHelper
+ * MasterpassHelper
  *
- * @author e057266
+ * @author Marcos Lazarin <marcoshoya at gmail dot com>
  */
 class MasterpassHelper
 {
