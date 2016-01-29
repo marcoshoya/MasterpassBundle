@@ -1,6 +1,7 @@
 services:
     hoya_masterpass_connector:
         class: Hoya\MasterpassBundle\Common\Connector
+        arguments:    ['%hoya_masterpass.sandbox%']
         
     hoya_masterpass_service:
         class: Hoya\MasterpassBundle\Service\MasterpassService

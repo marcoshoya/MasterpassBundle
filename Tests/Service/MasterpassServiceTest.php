@@ -17,7 +17,7 @@ class MasterpassServiceTest extends BaseWebTestCase
         
         $class = $container->get('hoya_masterpass_service');
         
-        $this->assertInstanceOf($class, '\Hoya\MasterpassBundle\Service\MasterpassService');
+        $this->assertInstanceOf('\Hoya\MasterpassBundle\Service\MasterpassService', $class);
     }
 
 }

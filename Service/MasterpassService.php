@@ -41,12 +41,6 @@ class MasterpassService extends Connector
 
     public $originUrl;
 
-    public function __construct($consumerKey, $privateKey, $originUrl)
-    {
-        parent::__construct($consumerKey, $privateKey);
-        $this->originUrl = $originUrl;
-    }
-
     public function getConsumerKey()
     {
         return $this->consumerKey;

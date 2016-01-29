@@ -71,10 +71,9 @@ class Connector
      * @param string $privateKey
      */
 
-    public function __construct($consumerKey, $privateKey)
+    public function __construct($consumerKey)
     {
         $this->consumerKey = $consumerKey;
-        $this->privateKey = $privateKey;
     }
 
     /**

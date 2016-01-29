@@ -14,6 +14,7 @@ use Symfony\Component\DependencyInjection\Loader;
  */
 class HoyaMasterpassExtension extends Extension
 {
+
     /**
      * {@inheritdoc}
      */
@@ -21,8 +22,12 @@ class HoyaMasterpassExtension extends Extension
     {
         $configuration = new Configuration();
         $config = $this->processConfiguration($configuration, $configs);
+        foreach ($config as $name => $node) {
+            $container->setParameter('hoya_masterpass.' . $name, $node);
+        }
 
-        $loader = new Loader\YamlFileLoader($container, new FileLocator(__DIR__.'/../Resources/config'));
+        $loader = new Loader\YamlFileLoader($container, new FileLocator(__DIR__ . '/../Resources/config'));
         $loader->load('services.yml');
     }
+
 }
