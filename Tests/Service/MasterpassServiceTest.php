@@ -2,16 +2,22 @@
 
 namespace Hoya\MasterpassBundle\Tests\Service;
 
+use Hoya\MasterpassBundle\Tests\BaseWebTestCase;
+
 /**
  * MasterpassServiceTest
  *
  * @author Marcos Lazarin
  */
-class MasterpassServiceTest extends \PHPUnit_Framework_TestCase
+class MasterpassServiceTest extends BaseWebTestCase
 {
     public function testTest()
     {
-        $this->assertTrue(true);
+        $container = $this->getContainer();
+        
+        $class = $container->get('hoya_masterpass_service');
+        
+        $this->assertInstanceOf($class, '\Hoya\MasterpassBundle\Service\MasterpassService');
     }
 
 }

@@ -1,27 +1,39 @@
 {
-   "name":"marcoshoya/masterpass-bundle",
-   "type": "symfony-bundle",
-   "description": "Masterpass V6 Bundle",
-   "keywords":[
-      "masterpass",
-      "mastercard",
-      "symfony"
-   ],
-   "license":"MIT",
-   "authors":[
-      {
-         "name":"Marcos Vinicius Joia Lazarin",
-         "email":"marcoshoya@gmail.com"
-      }
-   ],
-   "require":{
-      "php": ">=5.4.0",
-      "symfony/framework-bundle": "~2.3|~3.0"
-   },
-   "target-dir": "Hoya/MasterpassBundle",
-   "autoload":{
-      "psr-0":{
-         "Hoya\\MasterpassBundle": ""
-      }
-   }
+    "name": "marcoshoya/masterpass-bundle",
+    "type": "symfony-bundle",
+    "description": "Masterpass V6 Bundle",
+    "keywords": [
+        "masterpass",
+        "mastercard",
+        "symfony"
+    ],
+    "license": "MIT",
+    "authors": [
+        {
+            "name": "Marcos Vinicius Joia Lazarin",
+            "email": "marcoshoya@gmail.com"
+        }
+    ],
+    "require": {
+        "php": ">=5.4.0",
+        "symfony/twig-bundle": "~2.3",
+        "symfony/framework-bundle": "~2.3|~3.0"
+    },
+    "require-dev": {
+        "symfony/css-selector": "~2.3",
+        "symfony/browser-kit": "~2.3",
+        "symfony/validator": "~2.3",
+        "symfony/yaml": "~2.3",
+        "symfony/form": "~2.3",
+        "symfony/finder": "~2.3",
+        "symfony/serializer": "~2.7",
+        "sensio/framework-extra-bundle": "~3.0",
+        "symfony/phpunit-bridge": "~2.7"
+    },
+    "target-dir": "Hoya/MasterpassBundle",
+    "autoload": {
+        "psr-0": {
+            "Hoya\\MasterpassBundle": ""
+        }
+    }
 }
