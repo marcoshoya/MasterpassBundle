@@ -2,6 +2,8 @@
 
 namespace Hoya\MasterpassBundle\Common;
 
+use Hoya\MasterpassBundle\Helper\MasterpassHelper;
+
 class Connector
 {
 
@@ -11,8 +13,6 @@ class Connector
     const EQUALS = "=";
     const DOUBLE_QUOTE = '"';
     const COMMA = ',';
-    const ENCODED_TILDE = '%7E';
-    const TILDE = '~';
     const COLON = ':';
     const SPACE = ' ';
     const UTF_8 = 'UTF-8';
@@ -58,9 +58,9 @@ class Connector
     public $signatureBaseString;
     public $authHeader;
     protected $consumerKey;
+    protected $keystorePassword;
     private $privateKey;
     public $keystorePath;
-    public $keystorePassword;
     private $version = '1.0';
     private $signatureMethod = 'RSA-SHA1';
     public $realm = "eWallet"; // This value is static
@@ -71,35 +71,10 @@ class Connector
      * @param string $privateKey
      */
 
-    public function __construct($consumerKey)
+    public function __construct($config)
     {
-        $this->consumerKey = $consumerKey;
-    }
-
-    /**
-     * Method to convert strings 'true' and 'false' to a boolean value
-     * If parameter string is not 'true' (case insensitive), then false will be returned
-     *
-     * @param String : $str
-     *
-     * @return boolean
-     */
-    public static function str_to_bool($str)
-    {
-        return (strcasecmp($str, TRUE) == 0) ? true : false;
-    }
-
-    public static function formatXML($resources)
-    {
-
-        if ($resources != null) {
-            $dom = new \DOMDocument;
-            $dom->preserveWhiteSpace = FALSE;
-            $dom->loadXML($resources);
-            $dom->formatOutput = TRUE;
-            $resources = $dom->saveXml();
-        }
-        return $resources;
+        $this->consumerKey = $config['consumerkey'];
+        $this->keystorePassword = $config['keystorepassword'];
     }
 
     protected function doSimpleRequest($url, $requestMethod, $body = null)
@@ -264,83 +239,19 @@ class Connector
     {
         $urlMap = parse_url($url);
 
-        $url = $this->formatUrl($url, $params);
+        $url = MasterpassHelper::formatUrl($url, $params);
+        $params = MasterpassHelper::parseUrlParameters($urlMap, $params);
 
-        $params = $this->parseUrlParameters($urlMap, $params);
-
-
-        $baseString = strtoupper($requestMethod) . Connector::AMP . $this->RFC3986urlencode($url) . Connector::AMP;
+        $baseString = strtoupper($requestMethod) . Connector::AMP . MasterpassHelper::RFC3986urlencode($url) . Connector::AMP;
         ksort($params);
 
         $parameters = Connector::EMPTY_STRING;
         foreach ($params as $key => $value) {
-            $parameters = $parameters . $key . Connector::EQUALS . $this->RFC3986urlencode($value) . Connector::AMP;
+            $parameters = $parameters . $key . Connector::EQUALS . MasterpassHelper::RFC3986urlencode($value) . Connector::AMP;
         }
-        $parameters = $this->RFC3986urlencode(substr($parameters, 0, strlen($parameters) - 1));
+        $parameters = MasterpassHelper::RFC3986urlencode(substr($parameters, 0, strlen($parameters) - 1));
 
         return $baseString . $parameters;
-    }
-
-    /**
-     * Method to extract the URL parameters and add them to the params array
-     * 
-     * @param string $urlMap
-     * @param string $params
-     * 
-     * @return string|multitype:
-     */
-    function parseUrlParameters($urlMap, $params)
-    {
-        if (empty($urlMap['query'])) {
-
-            return $params;
-        } else {
-            $str = $urlMap['query'];
-            parse_str($str, $urlParamsArray);
-            foreach ($urlParamsArray as $key => $value) {
-                $urlParamsArray[$key] = $this->RFC3986urlencode($value);
-            }
-
-            return array_merge($params, $urlParamsArray);
-        }
-    }
-
-    /**
-     * Method to format the URL that is included in the signature base string 
-     * 
-     * @param string $url
-     * @param string $params
-     * 
-     * @return string|string
-     */
-    function formatUrl($url, $params)
-    {
-        if (!parse_url($url)) {
-
-            return $url;
-        }
-        $urlMap = parse_url($url);
-
-        return $urlMap['scheme'] . '://' . $urlMap['host'] . $urlMap['path'];
-    }
-
-    /**
-     * URLEncoder that conforms to the RFC3986 spec.
-     * PHP's internal function, rawurlencode, does not conform to RFC3986 for PHP 5.2
-     * 
-     * @param unknown $string
-     * 
-     * @return unknown|mixed
-     */
-    function RFC3986urlencode($string)
-    {
-        if ($string === false) {
-
-            return $string;
-        } else {
-
-            return str_replace(Connector::ENCODED_TILDE, Connector::TILDE, rawurlencode($string));
-        }
     }
 
     /**
@@ -424,7 +335,7 @@ class Connector
      * 
      * @return Exception
      */
-    private function checkForErrors(Exception $e)
+    private function checkForErrors(\Exception $e)
     {
         if (strpos($e->getMessage(), Connector::HTML_TAG) !== false) {
             $body = substr($e->getMessage(), strpos($e->getMessage(), Connector::HTML_BODY_OPEN) + 6, strpos($e->getMessage(), Connector::HTML_BODY_CLOSE));

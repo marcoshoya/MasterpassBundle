@@ -27,7 +27,7 @@ class Configuration implements ConfigurationInterface
                     ->addDefaultsIfNotSet()
                     ->children()
                         ->scalarNode('consumerkey')->defaultValue(self::$ck)->end()
-                        ->scalarNode('password')->defaultValue('changeit')->end()
+                        ->scalarNode('keystorepassword')->defaultValue('changeit')->end()
                     ->end()
                 ->end()
             ->end()
