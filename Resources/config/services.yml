@@ -1,7 +1,11 @@
 services:
+    hoya_masterpass_url:
+        class: Hoya\MasterpassBundle\Common\URL
+        arguments: ['%hoya_masterpass.deploy%', '%hoya_masterpass.callback%']
+        
     hoya_masterpass_connector:
         class: Hoya\MasterpassBundle\Common\Connector
-        arguments:    ['%hoya_masterpass.sandbox%']
+        arguments:    ['@hoya_masterpass_url', '%hoya_masterpass.keys%']
         
     hoya_masterpass_service:
         class: Hoya\MasterpassBundle\Service\MasterpassService

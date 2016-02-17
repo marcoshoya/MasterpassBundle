@@ -5,19 +5,35 @@ namespace Hoya\MasterpassBundle\Common;
 class URL
 {
 
-    const SBX_REQUESTURL = "https://sandbox.api.mastercard.com/oauth/consumer/v1/request_token";
-    const SBX_SHOPPINGCARTURL = "https://sandbox.api.mastercard.com/masterpass/v6/shopping-cart";
-    const SBX_ACCESSURL = "https://sandbox.api.mastercard.com/oauth/consumer/v1/access_token";
-    const SBX_POSTBACKURL = "https://sandbox.api.mastercard.com/masterpass/v6/transaction";
-    const SBX_PRECHECKOUTURL = "https://sandbox.api.mastercard.com/masterpass/v6/precheckout";
-    const SBX_MERCHANTINITURL = "https://sandbox.api.mastercard.com/masterpass/v6/merchant-initialization";
+    const REQUESTURL = "api.mastercard.com/oauth/consumer/v1/request_token";
+    const SHOPPINGCARTURL = "api.mastercard.com/masterpass/v6/shopping-cart";
+    const SBX_ACCESSURL = "api.mastercard.com/oauth/consumer/v1/access_token";
+    const SBX_POSTBACKURL = "api.mastercard.com/masterpass/v6/transaction";
+    const SBX_PRECHECKOUTURL = "api.mastercard.com/masterpass/v6/precheckout";
+    const SBX_MERCHANTINITURL = "api.mastercard.com/masterpass/v6/merchant-initialization";
     
-    const PRD_REQUESTURL = "https://api.mastercard.com/oauth/consumer/v1/request_token";
-    const PRD_SHOPPINGCARTURL = "https://api.mastercard.com/masterpass/v6/shopping-cart";
-    const PRD_ACCESSURL = "https://api.mastercard.com/oauth/consumer/v1/access_token";
-    const PRD_POSTBACKURL = "https://api.mastercard.com/masterpass/v6/transaction";
-    const PRD_PRECHECKOUTURL = "https://api.mastercard.com/masterpass/v6/precheckout";
-    const PRD_MERCHANTINITURL = "https://api.mastercard.com/masterpass/v6/merchant-initialization";
+    private $deploy;
+    
+    private $callback;
+    
+    public function __construct($deploy, $callback)
+    {
+        $this->deploy = $deploy;
+        $this->callback = $callback;
+    }
+    
+    /**
+     * Build URL according env
+     * 
+     * @param sring $url
+     * @param boolean $prd
+     * 
+     * @return string
+     */
+    private function buildUrl($url)
+    {
+        return $this->deploy ? sprintf('https://%s', $url) : sprintf('https://sandbox.%s', $url);
+    }
 
     public static function addQueryParameter($url, $descriptor, $value)
     {
@@ -29,4 +45,37 @@ class URL
             return $url;
         }
     }
+    
+    public function isProduction()
+    {
+        return (bool) $this->deploy;
+    }
+    
+    public function getCallbackurl()
+    {
+        return $this->callback;
+    }
+    
+    /**
+     * Get request-token Url
+     * 
+     * @param boolean $prd
+     * @return string
+     */
+    public function getRequestUrl()
+    {
+        return $this->buildUrl(self::REQUESTURL);
+    }
+    
+    /**
+     * Get shopping-cart Url
+     * 
+     * @param boolean $prd
+     * @return string
+     */
+    public function getShoppingcartUrl()
+    {
+        return $this->buildUrl(self::SHOPPINGCARTURL);
+    }
+    
 }

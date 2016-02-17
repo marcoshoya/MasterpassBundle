@@ -3,6 +3,7 @@
 namespace Hoya\MasterpassBundle\Common;
 
 use Hoya\MasterpassBundle\Helper\MasterpassHelper;
+use Hoya\MasterpassBundle\Common\URL;
 
 class Connector
 {
@@ -55,6 +56,8 @@ class Connector
     const CONTENT_TYPE_APPLICATION_XML = 'Content-Type: application/xml';
     const SSL_ERROR_MESSAGE = "SSL Error Code: %s %sSSL Error Message: %s";
 
+    protected $urlService;
+    
     public $signatureBaseString;
     public $authHeader;
     protected $consumerKey;
@@ -71,10 +74,16 @@ class Connector
      * @param string $privateKey
      */
 
-    public function __construct($config)
+    public function __construct(URL $url, $keys)
     {
-        $this->consumerKey = $config['consumerkey'];
-        $this->keystorePassword = $config['keystorepassword'];
+        $this->urlService = $url;
+        if ($this->urlService->isProduction()) {
+            $this->consumerKey = $keys['production']['consumerkey'];
+            $this->keystorePassword = $keys['production']['keystorepassword'];
+        } else {
+            $this->consumerKey = $keys['sandbox']['consumerkey'];
+            $this->keystorePassword = $keys['sandbox']['keystorepassword'];
+        }
     }
 
     protected function doSimpleRequest($url, $requestMethod, $body = null)
@@ -278,10 +287,10 @@ class Connector
     /**
      * General method to handle all HTTP connections
      * 
-     * @param unknown $params
-     * @param unknown $realm
-     * @param unknown $url
-     * @param unknown $requestMethod
+     * @param array $params
+     * @param string $realm
+     * @param string $url
+     * @param string $requestMethod
      * @param string $body
      * 
      * @throws Exception - If connection fails or receives a HTTP status code > 300

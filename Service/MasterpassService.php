@@ -189,22 +189,19 @@ class MasterpassService extends Connector
         return $params;
     }
 
-    /*     * ************* Private Methods **************************************************************************************************************************** */
-
     /**
      * SDK:
      * Get the user's request token and store it in the current user session.
-     * @param $requestUrl
-     * @param $callbackUrl
+     * 
      * @return RequestTokenResponse
      */
-    public function GetRequestToken($requestUrl, $callbackUrl)
+    public function getRequestToken()
     {
         $params = array(
-            Connector::OAUTH_CALLBACK => $callbackUrl
+            Connector::OAUTH_CALLBACK => $this->urlService->getCallbackUrl()
         );
 
-        $response = $this->doRequest($params, $requestUrl, Connector::POST, null);
+        $response = $this->doRequest($params, $this->urlService->getRequestUrl(), Connector::POST, null);
         $requestTokenInfo = $this->parseConnectionResponse($response);
 
         $return = new RequestTokenResponse();
