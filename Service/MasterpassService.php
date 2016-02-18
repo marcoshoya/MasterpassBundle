@@ -41,11 +41,6 @@ class MasterpassService extends Connector
 
     public $originUrl;
 
-    public function getConsumerKey()
-    {
-        return $this->consumerKey;
-    }
-
     /**
      * SDK:
      * This method captures the Checkout Resource URL and Request Token Verifier

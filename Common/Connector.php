@@ -86,7 +86,7 @@ class Connector
             $this->keystorePassword = $keys['sandbox']['keystorepassword'];
         }
 
-        $this->privateKey = $this->getPrivateKey($this->keystorePath, $this->keystorePassword);
+        $this->privateKey = $this->getPrivateKey();
     }
 
     /**
@@ -94,23 +94,28 @@ class Connector
      *
      * @return Private key string
      */
-    private function getPrivateKey($keystorePath, $keystorePassword)
+    private function getPrivateKey()
     {
-        $path = realpath($keystorePath);
+        if (!$path = realpath($this->keystorePath)) {
+            throw new \Exception("File {$this->keystorePath} does not exist");
+        }
+
+        if (!$pkcs12 = @file_get_contents($path)) {
+            throw new \Exception("Cert file {$path} cannot be read");
+        }
+
         $keystore = array();
+        if (!openssl_pkcs12_read($pkcs12, $keystore, $this->keystorePassword)) {
+            throw new \Exception("PKCS12 cannot be decoded");
+        }
 
-        $pkcs12 = file_get_contents($path);
-        trim(openssl_pkcs12_read($pkcs12, $keystore, $keystorePassword));
-
-        return $keystore['pkey'];
+        return trim($keystore['pkey']);
     }
 
     protected function doSimpleRequest($url, $requestMethod, $body = null)
     {
         return self::doRequest(array(), $url, $requestMethod, $body);
     }
-
-    /*     * ************* Private Methods **************************************************************************************************************************** */
 
     /**
      *  Method used for all Http connections
@@ -245,9 +250,9 @@ class Connector
      */
     private function sign($string, $privateKey)
     {
-
         $privatekeyid = openssl_get_privatekey($privateKey);
 
+        $signature = null;
         openssl_sign($string, $signature, $privatekeyid, OPENSSL_ALGO_SHA1);
 
         return base64_encode($signature);
@@ -288,16 +293,17 @@ class Connector
      */
     protected function oAuthParametersFactory()
     {
-        $nonce = $this->generateNonce(16);
-        $time = time();
+        if (null === $this->consumerKey) {
+            throw new \Exception("Consumer key cannot be NULL");
+        }
 
-        $params = array(
+        $params = [
             Connector::OAUTH_CONSUMER_KEY => $this->consumerKey,
             Connector::OAUTH_SIGNATURE_METHOD => $this->signatureMethod,
-            Connector::OAUTH_NONCE => $nonce,
-            Connector::OAUTH_TIMESTAMP => $time,
+            Connector::OAUTH_NONCE => $this->generateNonce(16),
+            Connector::OAUTH_TIMESTAMP => time(),
             Connector::OAUTH_VERSION => $this->version
-        );
+        ];
 
         return $params;
     }
