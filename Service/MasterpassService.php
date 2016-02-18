@@ -54,7 +54,7 @@ class MasterpassService extends Connector
      * @param $verifier
      * @return Output is Access Token
      */
-    public function GetAccessToken($accessUrl, $requestToken, $verifier)
+    public function getAccessToken($accessUrl, $requestToken, $verifier)
     {
         $params = array(
             MasterPassService::OAUTH_VERIFIER => $verifier,
@@ -89,6 +89,7 @@ class MasterpassService extends Connector
     {
         $return = $this->getRequestToken($requestUrl, $callbackUrl);
         $return->redirectURL = $this->getConsumerSignInUrl($acceptableCards, $checkoutProjectId, $xmlVersion, $shippingSuppression, $rewardsProgram, $authLevelBasic, $shippingLocationProfile, $walletSelector);
+        
         return $return;
     }
 
@@ -101,12 +102,12 @@ class MasterpassService extends Connector
      */
     public function parseConnectionResponse($responseString)
     {
-
         $token = array();
         foreach (explode(Connector::AMP, $responseString) as $p) {
             @list($name, $value) = explode(Connector::EQUALS, $p, 2);
             $token[$name] = urldecode($value);
         }
+
         return $token;
     }
 
@@ -123,15 +124,7 @@ class MasterpassService extends Connector
             Connector::OAUTH_BODY_HASH => $this->generateBodyHash($shoppingCartXml)
         );
         $response = $this->doRequest($params, $shoppingCartUrl, Connector::POST, $shoppingCartXml);
-        return $response;
-    }
-
-    public function postMerchantInitData($merchantInitUrl, $merchantInitXml)
-    {
-        $params = array(
-            Connector::OAUTH_BODY_HASH => $this->generateBodyHash($merchantInitXml)
-        );
-        $response = $this->doRequest($params, $merchantInitUrl, Connector::POST, $merchantInitXml);
+        
         return $response;
     }
 
@@ -143,13 +136,14 @@ class MasterpassService extends Connector
      * @param unknown $checkoutResourceUrl
      * @return Output is the Checkout XML string containing the users billing and shipping information
      */
-    public function GetPaymentShippingResource($checkoutResourceUrl, $accessToken)
+    public function getPaymentShippingResource($checkoutResourceUrl, $accessToken)
     {
         $params = array(
             MasterPassService::OAUTH_TOKEN => $accessToken
         );
 
         $response = $this->doRequest($params, $checkoutResourceUrl, Connector::GET, null);
+        
         return $response;
     }
 
@@ -159,7 +153,7 @@ class MasterpassService extends Connector
      * @param $merchantTransactions
      * @return Output is the response from MasterCard services
      */
-    public function PostCheckoutTransaction($postbackurl, $merchantTransactions)
+    public function postCheckoutTransaction($postbackurl, $merchantTransactions)
     {
         $params = array(
             Connector::OAUTH_BODY_HASH => $this->generateBodyHash($merchantTransactions)
@@ -177,16 +171,6 @@ class MasterpassService extends Connector
         );
         $response = $this->doRequest($params, $preCheckoutUrl, Connector::POST, $preCheckoutXml);
         return $response;
-    }
-
-    protected function OAuthParametersFactory()
-    {
-
-        $params = parent::OAuthParametersFactory();
-
-        $params[MasterPassService::ORIGIN_URL] = $this->originUrl;
-
-        return $params;
     }
 
     /**
@@ -234,7 +218,7 @@ class MasterpassService extends Connector
      *
      * @return string - URL to redirect the user to the MasterPass wallet site
      */
-    private function GetConsumerSignInUrl($acceptableCards, $checkoutProjectId, $xmlVersion, $shippingSuppression, $rewardsProgram, $authLevelBasic, $shippingLocationProfile, $walletSelector)
+    private function getConsumerSignInUrl($acceptableCards, $checkoutProjectId, $xmlVersion, $shippingSuppression, $rewardsProgram, $authLevelBasic, $shippingLocationProfile, $walletSelector)
     {
         $baseAuthUrl = $this->requestTokenInfo->authorizeUrl;
 
