@@ -11,17 +11,16 @@ class URL
     const SBX_POSTBACKURL = "api.mastercard.com/masterpass/v6/transaction";
     const SBX_PRECHECKOUTURL = "api.mastercard.com/masterpass/v6/precheckout";
     const SBX_MERCHANTINITURL = "api.mastercard.com/masterpass/v6/merchant-initialization";
-    
+
     private $deploy;
-    
     private $callback;
-    
+
     public function __construct($deploy, $callback)
     {
         $this->deploy = $deploy;
         $this->callback = $callback;
     }
-    
+
     /**
      * Build URL according env
      * 
@@ -45,17 +44,17 @@ class URL
             return $url;
         }
     }
-    
+
     public function isProduction()
     {
         return (bool) $this->deploy;
     }
-    
+
     public function getCallbackurl()
     {
         return $this->callback;
     }
-    
+
     /**
      * Get request-token Url
      * 
@@ -66,7 +65,7 @@ class URL
     {
         return $this->buildUrl(self::REQUESTURL);
     }
-    
+
     /**
      * Get shopping-cart Url
      * 
@@ -77,5 +76,5 @@ class URL
     {
         return $this->buildUrl(self::SHOPPINGCARTURL);
     }
-    
+
 }

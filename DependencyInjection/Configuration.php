@@ -12,7 +12,6 @@ use Symfony\Component\Config\Definition\ConfigurationInterface;
  */
 class Configuration implements ConfigurationInterface
 {
-    protected static $ck = 'cLb0tKkEJhGTITp_6ltDIibO5Wgbx4rIldeXM_jRd4b0476c!414f4859446c4a366c726a327474695545332b353049303d';
     /**
      * {@inheritdoc}
      */
@@ -23,23 +22,25 @@ class Configuration implements ConfigurationInterface
             ->root('hoya_masterpass')
             ->children()
                 ->booleanNode('deploy')->defaultFalse()->end()
-                ->scalarNode('callback')->defaultValue('http://localhost')->end()
-                ->scalarNode('checkoutidentifier')->defaultValue('a4a6x1ywxlkxzhensyvad1hepuouaesuv')->end()
+                ->scalarNode('callback')->defaultNull()->end()
+                ->scalarNode('checkoutidentifier')->defaultNull()->end()
                 ->arrayNode('keys')
                     ->addDefaultsIfNotSet()
                     ->children()
                         ->arrayNode('sandbox')
                             ->addDefaultsIfNotSet()
                             ->children()
-                                ->scalarNode('consumerkey')->defaultValue(self::$ck)->end()
-                                ->scalarNode('keystorepassword')->defaultValue('changeit')->end()
+                                ->scalarNode('consumerkey')->defaultNull()->end()
+                                ->scalarNode('keystorepath')->defaultNull()->end()
+                                ->scalarNode('keystorepassword')->defaultNull()->end()
                             ->end()
                         ->end()
                         ->arrayNode('production')
                             ->addDefaultsIfNotSet()
                             ->children()
-                                ->scalarNode('consumerkey')->defaultValue(self::$ck)->end()
-                                ->scalarNode('keystorepassword')->defaultValue('changeit')->end()
+                                ->scalarNode('consumerkey')->defaultNull()->end()
+                                ->scalarNode('keystorepath')->defaultNull()->end()
+                                ->scalarNode('keystorepassword')->defaultNull()->end()
                             ->end()
                         ->end()
                     ->end()

@@ -16,3 +16,13 @@ framework:
 twig:
     debug:            %kernel.debug%
     strict_variables: %kernel.debug%
+
+hoya_masterpass:
+    deploy: false
+    callback: http://localhost
+    checkoutidentifier: a4a6x1ywxlkxzhensyvad1hepuouaesuv
+    keys:
+        sandbox:
+            consumerkey: cLb0tKkEJhGTITp_6ltDIibO5Wgbx4rIldeXM_jRd4b0476c!414f4859446c4a366c726a327474695545332b353049303d
+            keystorepath: "%kernel.root_dir%/Certs/SandboxMCOpenAPI.p12"
+            keystorepassword: changeit

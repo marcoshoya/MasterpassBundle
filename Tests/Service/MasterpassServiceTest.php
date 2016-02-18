@@ -35,7 +35,11 @@ class MasterpassServiceTest extends BaseWebTestCase
     public function testRequestToken()
     {
         $rt = $this->service->getRequestToken();
+
         $this->assertInstanceOf('\Hoya\MasterpassBundle\DTO\RequestTokenResponse', $rt);
+        $this->assertGreaterThanOrEqual(40, strlen($rt->requestToken), 'requestToken does not have a valid format');
+        $this->assertGreaterThanOrEqual(40, strlen($rt->oAuthSecret), 'oAuthSecret does not have a valid format');
+        $this->assertEquals(900, $rt->oAuthExpiresIn, 'oAuthExpiresIn does not have a valid value');
     }
 
 }

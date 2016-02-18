@@ -57,13 +57,12 @@ class Connector
     const SSL_ERROR_MESSAGE = "SSL Error Code: %s %sSSL Error Message: %s";
 
     protected $urlService;
-    
     public $signatureBaseString;
     public $authHeader;
     protected $consumerKey;
+    protected $keystorePath;
     protected $keystorePassword;
     private $privateKey;
-    public $keystorePath;
     private $version = '1.0';
     private $signatureMethod = 'RSA-SHA1';
     public $realm = "eWallet"; // This value is static
@@ -79,11 +78,31 @@ class Connector
         $this->urlService = $url;
         if ($this->urlService->isProduction()) {
             $this->consumerKey = $keys['production']['consumerkey'];
+            $this->keystorePath = $keys['production']['keystorepath'];
             $this->keystorePassword = $keys['production']['keystorepassword'];
         } else {
             $this->consumerKey = $keys['sandbox']['consumerkey'];
+            $this->keystorePath = $keys['sandbox']['keystorepath'];
             $this->keystorePassword = $keys['sandbox']['keystorepassword'];
         }
+
+        $this->privateKey = $this->getPrivateKey($this->keystorePath, $this->keystorePassword);
+    }
+
+    /**
+     * Method to retrieve the private key from the p12 file
+     *
+     * @return Private key string
+     */
+    private function getPrivateKey($keystorePath, $keystorePassword)
+    {
+        $path = realpath($keystorePath);
+        $keystore = array();
+
+        $pkcs12 = file_get_contents($path);
+        trim(openssl_pkcs12_read($pkcs12, $keystore, $keystorePassword));
+
+        return $keystore['pkey'];
     }
 
     protected function doSimpleRequest($url, $requestMethod, $body = null)
@@ -174,8 +193,7 @@ class Connector
      */
     private function buildAuthHeaderString($params, $realm, $url, $requestMethod, $body)
     {
-
-        $params = array_merge($this->OAuthParametersFactory(), $params);
+        $params = array_merge($this->oAuthParametersFactory(), $params);
 
         $signature = $this->generateAndSignSignature($params, $url, $requestMethod, $this->privateKey, $body);
 
@@ -187,7 +205,7 @@ class Connector
         }
 
         foreach ($params as $key => $value) {
-            $startString = $startString . $key . Connector::EQUALS . Connector::DOUBLE_QUOTE . $this->RFC3986urlencode($value) . Connector::DOUBLE_QUOTE . Connector::COMMA;
+            $startString = $startString . $key . Connector::EQUALS . Connector::DOUBLE_QUOTE . MasterpassHelper::RFC3986urlencode($value) . Connector::DOUBLE_QUOTE . Connector::COMMA;
         }
 
         $this->authHeader = substr($startString, 0, strlen($startString) - 1);
@@ -268,7 +286,7 @@ class Connector
      * 
      * @return array
      */
-    protected function OAuthParametersFactory()
+    protected function oAuthParametersFactory()
     {
         $nonce = $this->generateNonce(16);
         $time = time();
