@@ -18,7 +18,7 @@ twig:
     strict_variables: %kernel.debug%
 
 hoya_masterpass:
-    deploy: false
+    production_mode: false
     callback: http://localhost
     checkoutidentifier: a4a6x1ywxlkxzhensyvad1hepuouaesuv
     keys:

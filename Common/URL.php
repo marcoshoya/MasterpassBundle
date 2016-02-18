@@ -12,12 +12,12 @@ class URL
     const SBX_PRECHECKOUTURL = "api.mastercard.com/masterpass/v6/precheckout";
     const SBX_MERCHANTINITURL = "api.mastercard.com/masterpass/v6/merchant-initialization";
 
-    private $deploy;
+    private $productionMode;
     private $callback;
 
-    public function __construct($deploy, $callback)
+    public function __construct($productionMode, $callback)
     {
-        $this->deploy = $deploy;
+        $this->productionMode = $productionMode;
         $this->callback = $callback;
     }
 
@@ -31,7 +31,7 @@ class URL
      */
     private function buildUrl($url)
     {
-        return $this->deploy ? sprintf('https://%s', $url) : sprintf('https://sandbox.%s', $url);
+        return $this->productionMode ? sprintf('https://%s', $url) : sprintf('https://sandbox.%s', $url);
     }
 
     public static function addQueryParameter($url, $descriptor, $value)
@@ -45,11 +45,21 @@ class URL
         }
     }
 
+    /**
+     * Verifies if is production environment or not
+     * 
+     * @return boolean
+     */
     public function isProduction()
     {
-        return (bool) $this->deploy;
+        return (bool) $this->productionMode;
     }
 
+    /**
+     * Gets callback url
+     * 
+     * @return string
+     */
     public function getCallbackurl()
     {
         return $this->callback;

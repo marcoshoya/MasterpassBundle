@@ -21,7 +21,7 @@ class Configuration implements ConfigurationInterface
         $treeBuilder
             ->root('hoya_masterpass')
             ->children()
-                ->booleanNode('deploy')->defaultFalse()->end()
+                ->booleanNode('production_mode')->defaultFalse()->end()
                 ->scalarNode('callback')->defaultNull()->end()
                 ->scalarNode('checkoutidentifier')->defaultNull()->end()
                 ->arrayNode('keys')
