@@ -113,12 +113,18 @@ class MasterpassService extends Connector
      * @param $ShoppingCartXml
      * @return Output is the response from MasterCard services
      */
-    public function postShoppingCartData($shoppingCartUrl, $shoppingCartXml)
+    public function postShoppingCartData(RequestTokenResponse $requestToken, $shoppingCartXml)
     {
+        $xml = simplexml_load_string($shoppingCartXml);
+        $xml->OAuthToken = $requestToken->requestToken;
+        $xml->OriginUrl = $this->urlService->getOriginUrl();
+        
+        $newShoppingCartXml = $xml->asXML();
+        
         $params = array(
-            Connector::OAUTH_BODY_HASH => $this->generateBodyHash($shoppingCartXml)
+            Connector::OAUTH_BODY_HASH => $this->generateBodyHash($newShoppingCartXml)
         );
-        $response = $this->doRequest($params, $shoppingCartUrl, Connector::POST, $shoppingCartXml);
+        $response = $this->doRequest($params, $this->urlService->getShoppingcartUrl(), Connector::POST, $newShoppingCartXml);
         
         return $response;
     }

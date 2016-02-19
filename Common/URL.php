@@ -86,5 +86,11 @@ class URL
     {
         return $this->buildUrl(self::SHOPPINGCARTURL);
     }
+    
+    public function getOriginUrl()
+    {
+        // @TODO
+        return 'http://localhost';
+    }
 
 }
