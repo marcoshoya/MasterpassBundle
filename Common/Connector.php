@@ -89,6 +89,16 @@ class Connector
         $this->privateKey = $this->getPrivateKey();
     }
 
+    public function getOriginUrl()
+    {
+        return $this->urlService->getOriginUrl();
+    }
+
+    public function getCallbackUrl()
+    {
+        return $this->urlService->getCallbackUrl();
+    }
+
     /**
      * Method to retrieve the private key from the p12 file
      *
@@ -112,9 +122,19 @@ class Connector
         return trim($keystore['pkey']);
     }
 
-    protected function doSimpleRequest($url, $requestMethod, $body = null)
+    public function doShoppingCart($params, $body)
     {
-        return self::doRequest(array(), $url, $requestMethod, $body);
+        return $this->doRequest($params, $this->urlService->getShoppingcartUrl(), Connector::POST, $body);
+    }
+
+    public function doAccessToken($params, $body)
+    {
+        return $this->doRequest($params, $this->urlService->getAccessUrl(), Connector::POST, $body);
+    }
+
+    public function doRequestToken($params, $body)
+    {
+        return $this->doRequest($params, $this->urlService->getRequestUrl(), Connector::POST, $body);
     }
 
     /**
@@ -129,7 +149,7 @@ class Connector
      *
      * @return mixed - Raw data returned from the HTTP connection
      */
-    protected function doRequest($params, $url, $requestMethod, $body = null)
+    public function doRequest($params, $url, $requestMethod, $body = null)
     {
 
         if ($body != null) {
@@ -158,7 +178,7 @@ class Connector
      * 
      * @return string
      */
-    protected function generateBodyHash($body)
+    public function generateBodyHash($body)
     {
         $sha1Hash = sha1($body, true);
 

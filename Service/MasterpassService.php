@@ -6,7 +6,7 @@ use Hoya\MasterpassBundle\Common\Connector;
 use Hoya\MasterpassBundle\DTO\AccessTokenResponse;
 use Hoya\MasterpassBundle\DTO\RequestTokenResponse;
 
-class MasterpassService extends Connector
+class MasterpassService
 {
 
     //Request Token Response
@@ -40,6 +40,17 @@ class MasterpassService extends Connector
     const APPROVAL_CODE = "sample";
 
     public $originUrl;
+    protected $connector;
+
+    /**
+     * Construct
+     * 
+     * @param Connector $connector
+     */
+    public function __construct(Connector $connector)
+    {
+        $this->connector = $connector;
+    }
 
     /**
      * SDK:
@@ -49,7 +60,7 @@ class MasterpassService extends Connector
      * @param $verifier
      * @return Output is Access Token
      */
-    public function getAccessToken($accessUrl, $requestToken, $verifier)
+    public function getAccessToken($requestToken, $verifier)
     {
         $params = array(
             MasterPassService::OAUTH_VERIFIER => $verifier,
@@ -57,11 +68,12 @@ class MasterpassService extends Connector
         );
 
         $return = new AccessTokenResponse();
-        $response = $this->doRequest($params, $accessUrl, Connector::POST, null);
+        $response = $this->connector->doAccessToken($params, null);
         $responseObject = $this->parseConnectionResponse($response);
 
         $return->accessToken = isset($responseObject[MasterPassService::OAUTH_TOKEN]) ? $responseObject[MasterPassService::OAUTH_TOKEN] : "";
         $return->oAuthSecret = isset($responseObject[MasterPassService::OAUTH_TOKEN]) ? $responseObject[MasterPassService::OAUTH_TOKEN_SECRET] : "";
+
         return $return;
     }
 
@@ -84,7 +96,7 @@ class MasterpassService extends Connector
     {
         $return = $this->getRequestToken($requestUrl, $callbackUrl);
         $return->redirectURL = $this->getConsumerSignInUrl($acceptableCards, $checkoutProjectId, $xmlVersion, $shippingSuppression, $rewardsProgram, $authLevelBasic, $shippingLocationProfile, $walletSelector);
-        
+
         return $return;
     }
 
@@ -117,15 +129,15 @@ class MasterpassService extends Connector
     {
         $xml = simplexml_load_string($shoppingCartXml);
         $xml->OAuthToken = $requestToken->requestToken;
-        $xml->OriginUrl = $this->urlService->getOriginUrl();
-        
+        $xml->OriginUrl = $this->connector->getOriginUrl();
+
         $newShoppingCartXml = $xml->asXML();
-        
+
         $params = array(
-            Connector::OAUTH_BODY_HASH => $this->generateBodyHash($newShoppingCartXml)
+            Connector::OAUTH_BODY_HASH => $this->connector->generateBodyHash($newShoppingCartXml)
         );
-        $response = $this->doRequest($params, $this->urlService->getShoppingcartUrl(), Connector::POST, $newShoppingCartXml);
-        
+        $response = $this->connector->doShoppingCart($params, $newShoppingCartXml);
+
         return $response;
     }
 
@@ -143,8 +155,8 @@ class MasterpassService extends Connector
             MasterPassService::OAUTH_TOKEN => $accessToken
         );
 
-        $response = $this->doRequest($params, $checkoutResourceUrl, Connector::GET, null);
-        
+        $response = $this->connector->doRequest($params, $checkoutResourceUrl, Connector::GET, null);
+
         return $response;
     }
 
@@ -157,10 +169,10 @@ class MasterpassService extends Connector
     public function postCheckoutTransaction($postbackurl, $merchantTransactions)
     {
         $params = array(
-            Connector::OAUTH_BODY_HASH => $this->generateBodyHash($merchantTransactions)
+            Connector::OAUTH_BODY_HASH => $this->connector->generateBodyHash($merchantTransactions)
         );
 
-        $response = $this->doRequest($params, $postbackurl, Connector::POST, $merchantTransactions);
+        $response = $this->connector->doRequest($params, $postbackurl, Connector::POST, $merchantTransactions);
 
         return $response;
     }
@@ -170,7 +182,7 @@ class MasterpassService extends Connector
         $params = array(
             MasterPassService::OAUTH_TOKEN => $accessToken
         );
-        $response = $this->doRequest($params, $preCheckoutUrl, Connector::POST, $preCheckoutXml);
+        $response = $this->connector->doRequest($params, $preCheckoutUrl, Connector::POST, $preCheckoutXml);
         return $response;
     }
 
@@ -183,10 +195,10 @@ class MasterpassService extends Connector
     public function getRequestToken()
     {
         $params = array(
-            Connector::OAUTH_CALLBACK => $this->urlService->getCallbackUrl()
+            Connector::OAUTH_CALLBACK => $this->connector->getCallbackUrl()
         );
 
-        $response = $this->doRequest($params, $this->urlService->getRequestUrl(), Connector::POST, null);
+        $response = $this->connector->doRequestToken($params, null);
         $requestTokenInfo = $this->parseConnectionResponse($response);
 
         $return = new RequestTokenResponse();
@@ -294,6 +306,14 @@ class MasterpassService extends Connector
         $paramString .= $key . Connector::EQUALS . $value;
 
         return $paramString;
+    }
+
+    public function parseCallback(\Symfony\Component\HttpFoundation\Request $request)
+    {
+        $request->get('mpstatus');
+        $request->get('checkout_resource_url', null);
+        $request->get('oauth_verifier', null);
+        $request->get('oauth_token', null);
     }
 
 }

@@ -7,7 +7,7 @@ class URL
 
     const REQUESTURL = "api.mastercard.com/oauth/consumer/v1/request_token";
     const SHOPPINGCARTURL = "api.mastercard.com/masterpass/v6/shopping-cart";
-    const SBX_ACCESSURL = "api.mastercard.com/oauth/consumer/v1/access_token";
+    const ACCESSURL = "api.mastercard.com/oauth/consumer/v1/access_token";
     const SBX_POSTBACKURL = "api.mastercard.com/masterpass/v6/transaction";
     const SBX_PRECHECKOUTURL = "api.mastercard.com/masterpass/v6/precheckout";
     const SBX_MERCHANTINITURL = "api.mastercard.com/masterpass/v6/merchant-initialization";
@@ -86,6 +86,13 @@ class URL
     {
         return $this->buildUrl(self::SHOPPINGCARTURL);
     }
+    
+    
+    public function getAccessUrl()
+    {
+        return $this->buildUrl(self::ACCESSURL);
+    }
+    
     
     public function getOriginUrl()
     {
