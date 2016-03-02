@@ -5,6 +5,7 @@ namespace Hoya\MasterpassBundle\Service;
 use Hoya\MasterpassBundle\Common\Connector;
 use Hoya\MasterpassBundle\DTO\AccessTokenResponse;
 use Hoya\MasterpassBundle\DTO\RequestTokenResponse;
+use Hoya\MasterpassBundle\DTO\CallbackResponse;
 
 class MasterpassService
 {
@@ -307,13 +308,22 @@ class MasterpassService
 
         return $paramString;
     }
-
+    
+    /**
+     * Parse the callback response
+     * 
+     * @param \Symfony\Component\HttpFoundation\Request $request
+     * @return CallbackResponse
+     */
     public function parseCallback(\Symfony\Component\HttpFoundation\Request $request)
     {
-        $request->get('mpstatus');
-        $request->get('checkout_resource_url', null);
-        $request->get('oauth_verifier', null);
-        $request->get('oauth_token', null);
+        $callback = new CallbackResponse;
+        $callback->mpstatus = $request->get('mpstatus');
+        $callback->checkoutResourceUrl = $request->get('checkout_resource_url', null);
+        $callback->oauthVerifier = $request->get('oauth_verifier', null);
+        $callback->oauthToken = $request->get('oauth_token', null);
+        
+        return $callback;
     }
 
 }
