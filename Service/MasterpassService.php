@@ -38,7 +38,6 @@ class MasterpassService
     const REALM_TYPE = 'eWallet';
     const APPROVAL_CODE = 'sample';
 
-    public $originUrl;
     protected $connector;
 
     /**
