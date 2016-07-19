@@ -1,3 +1,4 @@
-hoya_masterpass_homepage:
-    path:     /hello/{name}
-    defaults: { _controller: HoyaMasterpassBundle:Default:index }
+hoya_masterpass:
+    resource: "@HoyaMasterpassBundle/Controller/"
+    type:      annotation
+    prefix:    /masterpass
