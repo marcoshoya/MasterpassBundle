@@ -63,16 +63,16 @@ class MasterpassService
     public function getAccessToken($requestToken, $verifier)
     {
         $params = array(
-            MasterPassService::OAUTH_VERIFIER => $verifier,
-            MasterPassService::OAUTH_TOKEN => $requestToken
+            MasterpassService::OAUTH_VERIFIER => $verifier,
+            MasterpassService::OAUTH_TOKEN => $requestToken
         );
 
         $return = new AccessTokenResponse();
         $response = $this->connector->doAccessToken($params, null);
         $responseObject = $this->parseConnectionResponse($response);
 
-        $return->accessToken = isset($responseObject[MasterPassService::OAUTH_TOKEN]) ? $responseObject[MasterPassService::OAUTH_TOKEN] : "";
-        $return->oAuthSecret = isset($responseObject[MasterPassService::OAUTH_TOKEN]) ? $responseObject[MasterPassService::OAUTH_TOKEN_SECRET] : "";
+        $return->accessToken = isset($responseObject[MasterpassService::OAUTH_TOKEN]) ? $responseObject[MasterpassService::OAUTH_TOKEN] : "";
+        $return->oAuthSecret = isset($responseObject[MasterpassService::OAUTH_TOKEN]) ? $responseObject[MasterpassService::OAUTH_TOKEN_SECRET] : "";
 
         return $return;
     }
@@ -152,7 +152,7 @@ class MasterpassService
     public function getPaymentShippingResource($checkoutResourceUrl, $accessToken)
     {
         $params = array(
-            MasterPassService::OAUTH_TOKEN => $accessToken
+            MasterpassService::OAUTH_TOKEN => $accessToken
         );
 
         $response = $this->connector->doRequest($params, $checkoutResourceUrl, Connector::GET, null);
@@ -180,7 +180,7 @@ class MasterpassService
     public function getPreCheckoutData($preCheckoutUrl, $preCheckoutXml, $accessToken)
     {
         $params = array(
-            MasterPassService::OAUTH_TOKEN => $accessToken
+            MasterpassService::OAUTH_TOKEN => $accessToken
         );
         $response = $this->connector->doRequest($params, $preCheckoutUrl, Connector::POST, $preCheckoutXml);
         return $response;
@@ -202,11 +202,11 @@ class MasterpassService
         $requestTokenInfo = $this->parseConnectionResponse($response);
 
         $return = new RequestTokenResponse();
-        $return->requestToken = isset($requestTokenInfo[MasterPassService::OAUTH_TOKEN]) ? $requestTokenInfo[MasterPassService::OAUTH_TOKEN] : '';
-        $return->authorizeUrl = isset($requestTokenInfo[MasterPassService::XOAUTH_REQUEST_AUTH_URL]) ? $requestTokenInfo[MasterPassService::XOAUTH_REQUEST_AUTH_URL] : '';
-        $return->callbackConfirmed = isset($requestTokenInfo[MasterPassService::OAUTH_CALLBACK_CONFIRMED]) ? $requestTokenInfo[MasterPassService::OAUTH_CALLBACK_CONFIRMED] : '';
-        $return->oAuthExpiresIn = isset($requestTokenInfo[MasterPassService::OAUTH_EXPIRES_IN]) ? $requestTokenInfo[MasterPassService::OAUTH_EXPIRES_IN] : '';
-        $return->oAuthSecret = isset($requestTokenInfo[MasterPassService::OAUTH_TOKEN_SECRET]) ? $requestTokenInfo[MasterPassService::OAUTH_TOKEN_SECRET] : '';
+        $return->requestToken = isset($requestTokenInfo[MasterpassService::OAUTH_TOKEN]) ? $requestTokenInfo[MasterpassService::OAUTH_TOKEN] : '';
+        $return->authorizeUrl = isset($requestTokenInfo[MasterpassService::XOAUTH_REQUEST_AUTH_URL]) ? $requestTokenInfo[MasterpassService::XOAUTH_REQUEST_AUTH_URL] : '';
+        $return->callbackConfirmed = isset($requestTokenInfo[MasterpassService::OAUTH_CALLBACK_CONFIRMED]) ? $requestTokenInfo[MasterpassService::OAUTH_CALLBACK_CONFIRMED] : '';
+        $return->oAuthExpiresIn = isset($requestTokenInfo[MasterpassService::OAUTH_EXPIRES_IN]) ? $requestTokenInfo[MasterpassService::OAUTH_EXPIRES_IN] : '';
+        $return->oAuthSecret = isset($requestTokenInfo[MasterpassService::OAUTH_TOKEN_SECRET]) ? $requestTokenInfo[MasterpassService::OAUTH_TOKEN_SECRET] : '';
 
         $this->requestTokenInfo = $return;
 
@@ -229,7 +229,7 @@ class MasterpassService
      * @param $shippingLocationProfile
      * @param $walletSelector
      *
-     * @return string - URL to redirect the user to the MasterPass wallet site
+     * @return string - URL to redirect the user to the Masterpass wallet site
      */
     private function getConsumerSignInUrl($acceptableCards, $checkoutProjectId, $xmlVersion, $shippingSuppression, $rewardsProgram, $authLevelBasic, $shippingLocationProfile, $walletSelector)
     {
@@ -238,8 +238,8 @@ class MasterpassService
         $xmlVersion = strtolower($xmlVersion);
 
         // Use v1 if xmlVersion does not match correct patern
-        if (!preg_match(MasterPassService::XML_VERSION_REGEX, $xmlVersion)) {
-            $xmlVersion = MasterPassService::DEFAULT_XMLVERSION;
+        if (!preg_match(MasterpassService::XML_VERSION_REGEX, $xmlVersion)) {
+            $xmlVersion = MasterpassService::DEFAULT_XMLVERSION;
         }
 
         $token = $this->requestTokenInfo->requestToken;
@@ -253,32 +253,32 @@ class MasterpassService
 
         // construct the Redirect URL
         $finalAuthUrl = $baseAuthUrl .
-            $this->getParamString(MasterPassService::ACCEPTABLE_CARDS, $acceptableCards, true) .
-            $this->getParamString(MasterPassService::CHECKOUT_IDENTIFIER, $checkoutProjectId) .
-            $this->getParamString(MasterPassService::OAUTH_TOKEN, $token) .
-            $this->getParamString(MasterPassService::VERSION, $xmlVersion);
+            $this->getParamString(MasterpassService::ACCEPTABLE_CARDS, $acceptableCards, true) .
+            $this->getParamString(MasterpassService::CHECKOUT_IDENTIFIER, $checkoutProjectId) .
+            $this->getParamString(MasterpassService::OAUTH_TOKEN, $token) .
+            $this->getParamString(MasterpassService::VERSION, $xmlVersion);
 
         // If xmlVersion is v1 (default version), then shipping suppression, rewardsprogram and auth_level are not used
-        if (strcasecmp($xmlVersion, MasterPassService::DEFAULT_XMLVERSION) != Connector::V1) {
+        if (strcasecmp($xmlVersion, MasterpassService::DEFAULT_XMLVERSION) != Connector::V1) {
 
             if ($shippingSuppression == 'true') {
-                $finalAuthUrl = $finalAuthUrl . $this->getParamString(MasterPassService::SUPPRESS_SHIPPING_ADDRESS, $shippingSuppression);
+                $finalAuthUrl = $finalAuthUrl . $this->getParamString(MasterpassService::SUPPRESS_SHIPPING_ADDRESS, $shippingSuppression);
             }
 
             if ((int) substr($xmlVersion, 1) >= 4 && $rewardsProgram == 'true') {
-                $finalAuthUrl = $finalAuthUrl . $this->getParamString(MasterPassService::ACCEPT_REWARDS_PROGRAM, $rewardsProgram);
+                $finalAuthUrl = $finalAuthUrl . $this->getParamString(MasterpassService::ACCEPT_REWARDS_PROGRAM, $rewardsProgram);
             }
 
             if ($authLevelBasic) {
-                $finalAuthUrl = $finalAuthUrl . $this->getParamString(MasterPassService::AUTH_LEVEL, MasterPassService::BASIC);
+                $finalAuthUrl = $finalAuthUrl . $this->getParamString(MasterpassService::AUTH_LEVEL, MasterpassService::BASIC);
             }
 
             if ((int) substr($xmlVersion, 1) >= 4 && $shippingLocationProfile != null && !empty($shippingLocationProfile)) {
-                $finalAuthUrl = $finalAuthUrl . $this->getParamString(MasterPassService::SHIPPING_LOCATION_PROFILE, $shippingLocationProfile);
+                $finalAuthUrl = $finalAuthUrl . $this->getParamString(MasterpassService::SHIPPING_LOCATION_PROFILE, $shippingLocationProfile);
             }
 
             if ((int) substr($xmlVersion, 1) >= 5 && $walletSelector == 'true') {
-                $finalAuthUrl = $finalAuthUrl . $this->getParamString(MasterPassService::WALLET_SELECTOR, $walletSelector);
+                $finalAuthUrl = $finalAuthUrl . $this->getParamString(MasterpassService::WALLET_SELECTOR, $walletSelector);
             }
         }
         return $finalAuthUrl;

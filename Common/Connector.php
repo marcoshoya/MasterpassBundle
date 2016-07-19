@@ -206,7 +206,7 @@ class Connector
     }
 
     /**
-     * Builds a Auth Header used in connection to MasterPass services
+     * Builds a Auth Header used in connection to Masterpass services
      * 
      * @param $params
      * @param $realm
