@@ -11,35 +11,24 @@ class URL
     const SBX_PRECHECKOUTURL = 'api.mastercard.com/masterpass/v6/precheckout';
     const SBX_MERCHANTINITURL = 'api.mastercard.com/masterpass/v6/merchant-initialization';
 
+    /**
+     * @var bool
+     */
     private $productionMode;
+
+    /**
+     * @var string
+     */
     private $callback;
 
+    /**
+     * @param bool   $productionMode
+     * @param string $callback
+     */
     public function __construct($productionMode, $callback)
     {
         $this->productionMode = $productionMode;
         $this->callback = $callback;
-    }
-
-    /**
-     * Build URL according env.
-     * 
-     * @param sring $url
-     * @param bool  $prd
-     * 
-     * @return string
-     */
-    private function buildUrl($url)
-    {
-        return $this->productionMode ? sprintf('https://%s', $url) : sprintf('https://sandbox.%s', $url);
-    }
-
-    public static function addQueryParameter($url, $descriptor, $value)
-    {
-        if ($value !== null) {
-            return sprintf('%s&%s=%s', $url, $descriptor, rawurlencode($value));
-        } else {
-            return $url;
-        }
     }
 
     /**
@@ -57,15 +46,13 @@ class URL
      * 
      * @return string
      */
-    public function getCallbackurl()
+    public function getCallbackUrl()
     {
         return $this->callback;
     }
 
     /**
      * Get request-token Url.
-     * 
-     * @param bool $prd
      *
      * @return string
      */
@@ -76,8 +63,6 @@ class URL
 
     /**
      * Get shopping-cart Url.
-     * 
-     * @param bool $prd
      *
      * @return string
      */
@@ -86,14 +71,32 @@ class URL
         return $this->buildUrl(self::SHOPPINGCARTURL);
     }
 
+    /**
+     * @return string
+     */
     public function getAccessUrl()
     {
         return $this->buildUrl(self::ACCESSURL);
     }
 
+    /**
+     * @return string
+     */
     public function getOriginUrl()
     {
         // @TODO
         return 'http://localhost';
+    }
+
+    /**
+     * Build URL according env.
+     *
+     * @param string $url
+     *
+     * @return string
+     */
+    private function buildUrl($url)
+    {
+        return $this->productionMode ? sprintf('https://%s', $url) : sprintf('https://sandbox.%s', $url);
     }
 }
