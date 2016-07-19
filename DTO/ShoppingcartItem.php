@@ -3,15 +3,14 @@
 namespace Hoya\MasterpassBundle\DTO;
 
 /**
- * ShoppingcartItem DTO
+ * ShoppingcartItem DTO.
  *
  * @author Marcos Lazarin <marcoshoya at gmail dot com>
  */
 class ShoppingcartItem
 {
-
     /**
-     * @var integer
+     * @var int
      */
     public $quantity;
 
@@ -31,7 +30,7 @@ class ShoppingcartItem
     private $amount;
 
     /**
-     * Set item amount and format without decimal points
+     * Set item amount and format without decimal points.
      * 
      * @param float $amount
      */
@@ -44,13 +43,12 @@ class ShoppingcartItem
     }
 
     /**
-     * Get Amount
+     * Get Amount.
      * 
-     * @return integer
+     * @return int
      */
     public function getAmount()
     {
         return $this->amount;
     }
-
 }

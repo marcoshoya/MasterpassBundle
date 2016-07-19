@@ -9,14 +9,13 @@ use Hoya\MasterpassBundle\DTO\ShoppingcartItem;
 use Hoya\MasterpassBundle\Service\MasterpassService;
 
 /**
- * MasterpassServiceTest
+ * MasterpassServiceTest.
  *
  * @author Marcos Lazarin
  */
 class MasterpassServiceTest extends BaseWebTestCase
 {
-
-    public $checkout = "<Checkout><Card><BrandId>master</BrandId><BrandName>MasterCard</BrandName><AccountNumber>5555555555554444</AccountNumber><BillingAddress><City>Boca Raton</City><Country>US</Country><CountrySubdivision>US-FL</CountrySubdivision><Line1>6600 Mobile Site Street</Line1><Line2>421</Line2><Line3></Line3><PostalCode>33496</PostalCode></BillingAddress><CardHolderName>JOE Test</CardHolderName><ExpiryMonth>4</ExpiryMonth><ExpiryYear>2017</ExpiryYear></Card><TransactionId>434801298</TransactionId><Contact><FirstName>JOE</FirstName><LastName>Test</LastName><Country>US</Country><EmailAddress>joe.test@email.com</EmailAddress><PhoneNumber>1-9876543210</PhoneNumber></Contact><ShippingAddress><City>New York</City><Country>SE</Country><CountrySubdivision>US-NY</CountrySubdivision><Line1>100 Street</Line1><Line2>Apt 6D</Line2><Line3></Line3><PostalCode>10128</PostalCode><RecipientName>JOE Test</RecipientName><RecipientPhoneNumber>US+1-12345</RecipientPhoneNumber></ShippingAddress><WalletID>101</WalletID><PreCheckoutTransactionId>a4a6x55-f2oib5-ik9vzomt-1-ikyc8085-m444</PreCheckoutTransactionId></Checkout>";
+    public $checkout = '<Checkout><Card><BrandId>master</BrandId><BrandName>MasterCard</BrandName><AccountNumber>5555555555554444</AccountNumber><BillingAddress><City>Boca Raton</City><Country>US</Country><CountrySubdivision>US-FL</CountrySubdivision><Line1>6600 Mobile Site Street</Line1><Line2>421</Line2><Line3></Line3><PostalCode>33496</PostalCode></BillingAddress><CardHolderName>JOE Test</CardHolderName><ExpiryMonth>4</ExpiryMonth><ExpiryYear>2017</ExpiryYear></Card><TransactionId>434801298</TransactionId><Contact><FirstName>JOE</FirstName><LastName>Test</LastName><Country>US</Country><EmailAddress>joe.test@email.com</EmailAddress><PhoneNumber>1-9876543210</PhoneNumber></Contact><ShippingAddress><City>New York</City><Country>SE</Country><CountrySubdivision>US-NY</CountrySubdivision><Line1>100 Street</Line1><Line2>Apt 6D</Line2><Line3></Line3><PostalCode>10128</PostalCode><RecipientName>JOE Test</RecipientName><RecipientPhoneNumber>US+1-12345</RecipientPhoneNumber></ShippingAddress><WalletID>101</WalletID><PreCheckoutTransactionId>a4a6x55-f2oib5-ik9vzomt-1-ikyc8085-m444</PreCheckoutTransactionId></Checkout>';
 
     protected function getService()
     {
@@ -24,7 +23,7 @@ class MasterpassServiceTest extends BaseWebTestCase
     }
 
     /**
-     * Testing service instance
+     * Testing service instance.
      */
     public function testInstance()
     {
@@ -32,7 +31,7 @@ class MasterpassServiceTest extends BaseWebTestCase
     }
 
     /**
-     * Testing request token
+     * Testing request token.
      * 
      * @return \Hoya\MasterpassBundle\DTO\RequestTokenResponse
      */
@@ -49,7 +48,7 @@ class MasterpassServiceTest extends BaseWebTestCase
     }
 
     /**
-     * Testing shoppingcart
+     * Testing shoppingcart.
      * 
      * @depends testRequestToken
      */
@@ -76,27 +75,28 @@ class MasterpassServiceTest extends BaseWebTestCase
     }
 
     /**
-     * Test access token return
+     * Test access token return.
      */
     public function testAccessToken()
     {
-        $return = "oauth_token=c7d33d2c6b6b49dc17db786c73a73b3abcadc43a&oauth_token_secret=399e50ba507a0faa27300ecfb50d55390f51f539";
+        $return = 'oauth_token=c7d33d2c6b6b49dc17db786c73a73b3abcadc43a&oauth_token_secret=399e50ba507a0faa27300ecfb50d55390f51f539';
 
         $connector = $this->getMockConnector($return);
 
         $service = new MasterpassService($connector);
 
-        $verifier = "8f55989fa03a6dbe173749d0c495872f4a38d84c";
-        $request = "259f063894e0a1ab8996f805bbbeeab535812d6f";
+        $verifier = '8f55989fa03a6dbe173749d0c495872f4a38d84c';
+        $request = '259f063894e0a1ab8996f805bbbeeab535812d6f';
 
         $accessTokenResponse = $service->getAccessToken($request, $verifier);
         $this->assertInstanceOf('\Hoya\MasterpassBundle\DTO\AccessTokenResponse', $accessTokenResponse);
     }
 
     /**
-     * Mock connector service
+     * Mock connector service.
      * 
      * @param string $return
+     *
      * @return mock
      */
     protected function getMockConnector($return)
@@ -111,5 +111,4 @@ class MasterpassServiceTest extends BaseWebTestCase
 
         return $mock;
     }
-
 }

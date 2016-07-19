@@ -4,7 +4,6 @@ namespace Hoya\MasterpassBundle\Common;
 
 class Serializer
 {
-
     private static $Data;
 
     private function GetaArray($arrayValue)
@@ -16,41 +15,40 @@ class Serializer
 
     public function Serialize($ObjectInstance, $ClassName)
     {
-        Serializer::$Data.="<Root>";
+        self::$Data .= '<Root>';
         $this->SerializeClass($ObjectInstance, $ClassName);
-        Serializer::$Data.="</Root>";
+        self::$Data .= '</Root>';
 
-        return Serializer::$Data;
+        return self::$Data;
     }
 
     public function SerializeClass($ObjectInstance, $ClassName)
     {
-        Serializer::$Data.="<" . $ClassName . ">";
+        self::$Data .= '<'.$ClassName.'>';
         $Class = new \ReflectionClass($ClassName);
         $ClassArray = array($ObjectInstance);
         $Properties = $Class->getProperties();
         $i = 0;
         foreach ($ClassArray as $ClassMember) {
             $prpName = $Properties[$i]->getName();
-            Serializer::$Data.="<" . $prpName . ">";
+            self::$Data .= '<'.$prpName.'>';
             $prpType = gettype($ClassMember);
 
-
             if ($prpType == 'object') {
-                $serializerinstance = new Serializer();
+                $serializerinstance = new self();
                 $serializerinstance->SerializeClass($ClassMember, get_class($ClassMember));
             }
             if ($prpType == 'array') {
                 $this->GetaArray($ClassMember);
             } else {
-                Serializer::$Data.=$ClassMember;
+                self::$Data .= $ClassMember;
             }
-            Serializer::$Data.="</" . $prpName . ">";
-            $i++;
+            self::$Data .= '</'.$prpName.'>';
+            ++$i;
         }
-        Serializer::$Data.="</" . $ClassName . ">";
+        self::$Data .= '</'.$ClassName.'>';
 
-        return Serializer::$Data;
+        return self::$Data;
     }
 
     public function WriteXmlFile($XmlData, $FilePath)
@@ -64,6 +62,7 @@ class Serializer
     public function DeserializeClass($xmlString)
     {
         $Xml = simplexml_load_string($xmlString, Account());
+
         return $this->Deserialize($Xml);
     }
 
@@ -75,7 +74,7 @@ class Serializer
             $instance = new \ReflectionClass($member->getName());
             $ins = $instance->newInstance();
             foreach ($member as $child) {
-                $rp = $instance->getMethod("set_" . $child->getName());
+                $rp = $instance->getMethod('set_'.$child->getName());
                 if (count($child->children()) == 0) {
                     $rp->invoke($ins, $child);
                 } else {
@@ -84,17 +83,14 @@ class Serializer
                 }
             }
             if (count($Root) == 1) {
-
                 return $ins;
             } else {
                 $result[$counter] = $ins;
-                $counter++;
+                ++$counter;
             }
             if ($counter == count($Root)) {
-
                 return $result;
             }
         }
     }
-
 }

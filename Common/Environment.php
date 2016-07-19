@@ -7,15 +7,13 @@ namespace Hoya\MasterpassBundle\Common;
  */
 class Environment
 {
-
     /**
      * Denotes that a transaction failed.
      */
-    const SANDBOX = "sandbox";
+    const SANDBOX = 'sandbox';
 
     /**
      * Denotes that a transaction succeeded.
      */
-    const PRODUCTION = "production";
-
+    const PRODUCTION = 'production';
 }
