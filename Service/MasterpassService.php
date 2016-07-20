@@ -85,8 +85,6 @@ class MasterpassService
      * SDK:
      * This method gets a request token and constructs the redirect URL.
      *
-     * @param $requestUrl
-     * @param $callbackUrl
      * @param $acceptableCards
      * @param $checkoutProjectId
      * @param $xmlVersion
@@ -96,12 +94,12 @@ class MasterpassService
      * @param $shippingLocationProfile
      * @param $walletSelector
      *
-     * @return Output is a RequestTokenResponse object containing all data returned from this method
+     * @return RequestTokenResponse
      */
-    public function getRequestTokenAndRedirectUrl($requestUrl, $callbackUrl, $acceptableCards, $checkoutProjectId, $xmlVersion, $shippingSuppression, $rewardsProgram, $authLevelBasic, $shippingLocationProfile, $walletSelector)
+    public function getRequestTokenAndRedirectUrl($acceptableCards, $checkoutProjectId, $xmlVersion, $shippingSuppression, $rewardsProgram, $authLevelBasic, $shippingLocationProfile, $walletSelector)
     {
-        $return = $this->getRequestToken($requestUrl, $callbackUrl);
-        $return->redirectURL = $this->getConsumerSignInUrl($acceptableCards, $checkoutProjectId, $xmlVersion, $shippingSuppression, $rewardsProgram, $authLevelBasic, $shippingLocationProfile, $walletSelector);
+        $return = $this->getRequestToken();
+        $return->redirectUrl = $this->getConsumerSignInUrl($acceptableCards, $checkoutProjectId, $xmlVersion, $shippingSuppression, $rewardsProgram, $authLevelBasic, $shippingLocationProfile, $walletSelector);
 
         return $return;
     }
