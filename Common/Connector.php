@@ -3,6 +3,7 @@
 namespace Hoya\MasterpassBundle\Common;
 
 use Hoya\MasterpassBundle\Helper\MasterpassHelper;
+use Ramsey\Uuid\Uuid;
 
 class Connector
 {
@@ -207,19 +208,11 @@ class Connector
      * This method generates and returns a unique nonce value to be used in
      * Wallet API OAuth calls.
      *
-     * @param int $length
-     * 
      * @return string
      */
-    private function generateNonce($length)
+    private function generateNonce()
     {
-        if (function_exists('com_create_guid') === true) {
-            return trim(com_create_guid(), '{}');
-        } else {
-            $u = md5(uniqid('nonce_', true));
-
-            return substr($u, 0, $length);
-        }
+        return Uuid::uuid4()->toString();
     }
 
     /**
@@ -337,7 +330,7 @@ class Connector
         $params = [
             self::OAUTH_CONSUMER_KEY => $this->consumerKey,
             self::OAUTH_SIGNATURE_METHOD => $this->signatureMethod,
-            self::OAUTH_NONCE => $this->generateNonce(16),
+            self::OAUTH_NONCE => $this->generateNonce(),
             self::OAUTH_TIMESTAMP => time(),
             self::OAUTH_VERSION => $this->version,
         ];
