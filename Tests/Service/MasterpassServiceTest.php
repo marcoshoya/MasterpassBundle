@@ -2,6 +2,7 @@
 
 namespace Hoya\MasterpassBundle\Tests\Service;
 
+use Hoya\MasterpassBundle\Common\Connector;
 use Hoya\MasterpassBundle\Tests\BaseWebTestCase;
 use Hoya\MasterpassBundle\DTO\RequestTokenResponse;
 use Hoya\MasterpassBundle\DTO\Shoppingcart;
@@ -17,6 +18,9 @@ class MasterpassServiceTest extends BaseWebTestCase
 {
     public $checkout = '<Checkout><Card><BrandId>master</BrandId><BrandName>MasterCard</BrandName><AccountNumber>5555555555554444</AccountNumber><BillingAddress><City>Boca Raton</City><Country>US</Country><CountrySubdivision>US-FL</CountrySubdivision><Line1>6600 Mobile Site Street</Line1><Line2>421</Line2><Line3></Line3><PostalCode>33496</PostalCode></BillingAddress><CardHolderName>JOE Test</CardHolderName><ExpiryMonth>4</ExpiryMonth><ExpiryYear>2017</ExpiryYear></Card><TransactionId>434801298</TransactionId><Contact><FirstName>JOE</FirstName><LastName>Test</LastName><Country>US</Country><EmailAddress>joe.test@email.com</EmailAddress><PhoneNumber>1-9876543210</PhoneNumber></Contact><ShippingAddress><City>New York</City><Country>SE</Country><CountrySubdivision>US-NY</CountrySubdivision><Line1>100 Street</Line1><Line2>Apt 6D</Line2><Line3></Line3><PostalCode>10128</PostalCode><RecipientName>JOE Test</RecipientName><RecipientPhoneNumber>US+1-12345</RecipientPhoneNumber></ShippingAddress><WalletID>101</WalletID><PreCheckoutTransactionId>a4a6x55-f2oib5-ik9vzomt-1-ikyc8085-m444</PreCheckoutTransactionId></Checkout>';
 
+    /**
+     * @return MasterpassService
+     */
     protected function getService()
     {
         return $this->getContainer()->get('hoya_masterpass_service');
@@ -33,7 +37,7 @@ class MasterpassServiceTest extends BaseWebTestCase
     /**
      * Testing request token.
      * 
-     * @return \Hoya\MasterpassBundle\DTO\RequestTokenResponse
+     * @return RequestTokenResponse
      */
     public function testRequestToken()
     {
@@ -97,7 +101,7 @@ class MasterpassServiceTest extends BaseWebTestCase
      * 
      * @param string $return
      *
-     * @return mock
+     * @return \PHPUnit_Framework_MockObject_MockObject|Connector
      */
     protected function getMockConnector($return)
     {

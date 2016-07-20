@@ -20,7 +20,7 @@ class MasterpassHelper
             $dom->preserveWhiteSpace = false;
             $dom->loadXML($resources);
             $dom->formatOutput = true;
-            $resources = $dom->saveXml();
+            $resources = $dom->saveXML();
         }
 
         return $resources;
@@ -45,7 +45,7 @@ class MasterpassHelper
      * @param string $urlMap
      * @param string $params
      * 
-     * @return string|multitype:
+     * @return mixed
      */
     public static function parseUrlParameters($urlMap, $params)
     {
@@ -84,9 +84,9 @@ class MasterpassHelper
      * URLEncoder that conforms to the RFC3986 spec.
      * PHP's internal function, rawurlencode, does not conform to RFC3986 for PHP 5.2.
      * 
-     * @param unknown $string
+     * @param mixed $string
      * 
-     * @return unknown|mixed
+     * @return mixed
      */
     public static function RFC3986urlencode($string)
     {

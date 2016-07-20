@@ -12,9 +12,11 @@ class MasterpassService
     const XOAUTH_REQUEST_AUTH_URL = 'xoauth_request_auth_url';
     const OAUTH_CALLBACK_CONFIRMED = 'oauth_callback_confirmed';
     const OAUTH_EXPIRES_IN = 'oauth_expires_in';
+
     //Request Token Response
     const OAUTH_TOKEN_SECRET = 'oauth_token_secret';
     const ORIGIN_URL = 'origin_url';
+
     // Callback URL parameters
     const OAUTH_TOKEN = 'oauth_token';
     const OAUTH_VERIFIER = 'oauth_verifier';
@@ -22,6 +24,7 @@ class MasterpassService
     const REDIRECT_URL = 'redirect_url';
     const PAIRING_TOKEN = 'pairing_token';
     const PAIRING_VERIFIER = 'pairing_verifier';
+
     // Redirect Parameters
     const CHECKOUT_IDENTIFIER = 'checkout_identifier';
     const ACCEPTABLE_CARDS = 'acceptable_cards';
@@ -38,11 +41,12 @@ class MasterpassService
     const REALM_TYPE = 'eWallet';
     const APPROVAL_CODE = 'sample';
 
+    /**
+     * @var Connector
+     */
     protected $connector;
 
     /**
-     * Construct.
-     * 
      * @param Connector $connector
      */
     public function __construct(Connector $connector)
@@ -150,8 +154,8 @@ class MasterpassService
      * This method retrieves the payment and shipping information
      * for the current user/session.
      *
-     * @param unknown $accessToken
-     * @param unknown $checkoutResourceUrl
+     * @param mixed $accessToken
+     * @param mixed $checkoutResourceUrl
      *
      * @return Output is the Checkout XML string containing the users billing and shipping information
      */

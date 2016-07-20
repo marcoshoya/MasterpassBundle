@@ -32,6 +32,7 @@ class Connector
     const OAUTH_BODY_HASH = 'oauth_body_hash';
     const BODY = 'body';
     const MESSAGE = 'Message';
+
     // Signature Base String
     const OAUTH_SIGNATURE = 'oauth_signature';
     const OAUTH_CONSUMER_KEY = 'oauth_consumer_key';
@@ -41,15 +42,18 @@ class Connector
     const OAUTH_CALLBACK = 'oauth_callback';
     const OAUTH_SIGNATURE_METHOD = 'oauth_signature_method';
     const OAUTH_VERSION = 'oauth_version';
-    // Srings to detect errors in the service calls
+
+    // Strings to detect errors in the service calls
     const ERRORS_TAG = '<Errors>';
     const HTML_TAG = '<html>';
     const HTML_BODY_OPEN = '<body>';
     const HTML_BODY_CLOSE = '</body>';
+
     // Error Messages
     const EMPTY_REQUEST_TOKEN_ERROR_MESSAGE = 'Invalid Request Token';
     const INVALID_AUTH_URL = 'Invalid Auth Url';
     const POSTBACK_ERROR_MESSAGE = 'Postback Transaction Call was unsuccessful';
+
     //Connection Strings
     const CONTENT_TYPE_APPLICATION_XML = 'Content-Type: application/xml';
     const SSL_ERROR_MESSAGE = 'SSL Error Code: %s %sSSL Error Message: %s';
@@ -66,12 +70,10 @@ class Connector
     public $realm = 'eWallet'; // This value is static
 
     /**
-     * Constructor for Connector.
-     *
-     * @param string $consumerKey
-     * @param string $privateKey
+     * @param URL   $url
+     * @param array $keys
      */
-    public function __construct(URL $url, $keys)
+    public function __construct(URL $url, array $keys)
     {
         $this->urlService = $url;
         if ($this->urlService->isProduction()) {
@@ -87,11 +89,17 @@ class Connector
         $this->privateKey = $this->getPrivateKey();
     }
 
+    /**
+     * @return string
+     */
     public function getOriginUrl()
     {
         return $this->urlService->getOriginUrl();
     }
 
+    /**
+     * @return string
+     */
     public function getCallbackUrl()
     {
         return $this->urlService->getCallbackUrl();
@@ -100,7 +108,9 @@ class Connector
     /**
      * Method to retrieve the private key from the p12 file.
      *
-     * @return Private key string
+     * @return string The private key
+     *
+     * @throws \Exception When the private key cannot be retrieved
      */
     private function getPrivateKey()
     {
@@ -120,16 +130,34 @@ class Connector
         return trim($keystore['pkey']);
     }
 
+    /**
+     * @param array       $params
+     * @param string|null $body
+     *
+     * @return string
+     */
     public function doShoppingCart($params, $body)
     {
         return $this->doRequest($params, $this->urlService->getShoppingcartUrl(), self::POST, $body);
     }
 
+    /**
+     * @param array       $params
+     * @param string|null $body
+     *
+     * @return string
+     */
     public function doAccessToken($params, $body)
     {
         return $this->doRequest($params, $this->urlService->getAccessUrl(), self::POST, $body);
     }
 
+    /**
+     * @param array       $params
+     * @param string|null $body
+     *
+     * @return string
+     */
     public function doRequestToken($params, $body)
     {
         return $this->doRequest($params, $this->urlService->getRequestUrl(), self::POST, $body);
@@ -138,12 +166,12 @@ class Connector
     /**
      *  Method used for all Http connections.
      *
-     * @param $params
-     * @param $url
-     * @param $requestMethod
-     * @param $body
+     * @param array       $params
+     * @param string      $url
+     * @param string      $requestMethod
+     * @param string|null $body
      *
-     * @throws Exception - When connection error
+     * @throws \Exception - When connection error
      *
      * @return mixed - Raw data returned from the HTTP connection
      */
@@ -160,18 +188,11 @@ class Connector
         }
     }
 
-    protected function doRequest2($params, $url, $requestMethod, $body = null)
-    {
-        if ($body != null) {
-            $params[self::OAUTH_BODY_HASH] = $this->generateBodyHash($body);
-        }
-    }
-
     /**
      * SDK:
      * Method to generate the body hash.
      * 
-     * @param $body
+     * @param string $body
      * 
      * @return string
      */
@@ -184,9 +205,9 @@ class Connector
 
     /**
      * This method generates and returns a unique nonce value to be used in
-     * 	Wallet API OAuth calls.
+     * Wallet API OAuth calls.
      *
-     * @param $length
+     * @param int $length
      * 
      * @return string
      */
@@ -204,11 +225,11 @@ class Connector
     /**
      * Builds a Auth Header used in connection to Masterpass services.
      * 
-     * @param $params
-     * @param $realm
-     * @param $url
-     * @param $requestMethod
-     * @param $body
+     * @param array       $params
+     * @param string      $realm
+     * @param string      $url
+     * @param string      $requestMethod
+     * @param string|null $body
      * 
      * @return string - Auth header
      */
@@ -237,11 +258,11 @@ class Connector
     /**
      * Method to generate base string and generate the signature.
      *  
-     * @param $params
-     * @param $url
-     * @param $requestMethod
-     * @param $privateKey
-     * @param $body
+     * @param array       $params
+     * @param string      $url
+     * @param string      $requestMethod
+     * @param string      $privateKey
+     * @param string|null $body
      * 
      * @return string
      */
@@ -259,8 +280,8 @@ class Connector
     /**
      * Method to sign string.
      * 
-     * @param $string
-     * @param $privateKey
+     * @param string $string
+     * @param string $privateKey
      * 
      * @return string
      */
@@ -277,9 +298,9 @@ class Connector
     /**
      * Method to generate the signature base string.
      * 
-     * @param $params
-     * @param $url
-     * @param $requestMethod
+     * @param array  $params
+     * @param string $url
+     * @param string $requestMethod
      * 
      * @return string
      */
@@ -306,6 +327,8 @@ class Connector
      * Method to create all default parameters used in the base string and auth header.
      * 
      * @return array
+     *
+     * @throws \Exception When the consumer key has not been provided to the service
      */
     protected function oAuthParametersFactory()
     {
@@ -327,13 +350,13 @@ class Connector
     /**
      * General method to handle all HTTP connections.
      * 
-     * @param array  $params
-     * @param string $realm
-     * @param string $url
-     * @param string $requestMethod
-     * @param string $body
+     * @param array       $params
+     * @param string      $realm
+     * @param string      $url
+     * @param string      $requestMethod
+     * @param string|null $body
      * 
-     * @throws Exception - If connection fails or receives a HTTP status code > 300
+     * @throws \Exception - If connection fails or receives a HTTP status code > 300
      * 
      * @return mixed
      */
@@ -379,9 +402,9 @@ class Connector
     /**
      * Method to check for HTML content in the exception message and remove everything except the body.
      * 
-     * @param Exception $e
+     * @param \Exception $e
      * 
-     * @return Exception
+     * @return \Exception
      */
     private function checkForErrors(\Exception $e)
     {
