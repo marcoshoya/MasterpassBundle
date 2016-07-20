@@ -225,19 +225,18 @@ class Connector
     /**
      * Builds a Auth Header used in connection to Masterpass services.
      * 
-     * @param array       $params
-     * @param string      $realm
-     * @param string      $url
-     * @param string      $requestMethod
-     * @param string|null $body
+     * @param array  $params
+     * @param string $realm
+     * @param string $url
+     * @param string $requestMethod
      * 
      * @return string - Auth header
      */
-    private function buildAuthHeaderString($params, $realm, $url, $requestMethod, $body)
+    private function buildAuthHeaderString($params, $realm, $url, $requestMethod)
     {
         $params = array_merge($this->oAuthParametersFactory(), $params);
 
-        $signature = $this->generateAndSignSignature($params, $url, $requestMethod, $this->privateKey, $body);
+        $signature = $this->generateAndSignSignature($params, $url, $requestMethod, $this->privateKey);
 
         $params[self::OAUTH_SIGNATURE] = $signature;
 
@@ -258,15 +257,14 @@ class Connector
     /**
      * Method to generate base string and generate the signature.
      *  
-     * @param array       $params
-     * @param string      $url
-     * @param string      $requestMethod
-     * @param string      $privateKey
-     * @param string|null $body
+     * @param array  $params
+     * @param string $url
+     * @param string $requestMethod
+     * @param string $privateKey
      * 
      * @return string
      */
-    private function generateAndSignSignature($params, $url, $requestMethod, $privateKey, $body)
+    private function generateAndSignSignature($params, $url, $requestMethod, $privateKey)
     {
         $baseString = $this->generateBaseString($params, $url, $requestMethod);
 
@@ -374,7 +372,7 @@ class Connector
         curl_setopt($curl, CURLOPT_HTTPHEADER, array(
             self::ACCEPT.self::COLON.self::SPACE.self::APPLICATION_XML,
             self::CONTENT_TYPE.self::COLON.self::SPACE.self::APPLICATION_XML,
-            self::AUTHORIZATION.self::COLON.self::SPACE.$this->buildAuthHeaderString($params, $realm, $url, $requestMethod, $body),
+            self::AUTHORIZATION.self::COLON.self::SPACE.$this->buildAuthHeaderString($params, $realm, $url, $requestMethod),
         ));
 
         if ($requestMethod == self::GET) {
