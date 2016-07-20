@@ -47,11 +47,17 @@ class MasterpassService
     protected $connector;
 
     /**
+     * @var RequestTokenResponse|null
+     */
+    protected $requestToken;
+
+    /**
      * @param Connector $connector
      */
     public function __construct(Connector $connector)
     {
         $this->connector = $connector;
+        $this->requestToken = null;
     }
 
     /**
@@ -59,10 +65,10 @@ class MasterpassService
      * This method captures the Checkout Resource URL and Request Token Verifier
      * and uses these to request the Access Token.
      *
-     * @param $requestToken
-     * @param $verifier
+     * @param string $requestToken
+     * @param string $verifier
      *
-     * @return Output is Access Token
+     * @return AccessTokenResponse
      */
     public function getAccessToken($requestToken, $verifier)
     {
@@ -71,14 +77,14 @@ class MasterpassService
             self::OAUTH_TOKEN => $requestToken,
         );
 
-        $return = new AccessTokenResponse();
+        $accessToken = new AccessTokenResponse();
         $response = $this->connector->doAccessToken($params, null);
         $responseObject = $this->parseConnectionResponse($response);
 
-        $return->accessToken = isset($responseObject[self::OAUTH_TOKEN]) ? $responseObject[self::OAUTH_TOKEN] : '';
-        $return->oAuthSecret = isset($responseObject[self::OAUTH_TOKEN]) ? $responseObject[self::OAUTH_TOKEN_SECRET] : '';
+        $accessToken->accessToken = isset($responseObject[self::OAUTH_TOKEN]) ? $responseObject[self::OAUTH_TOKEN] : '';
+        $accessToken->oAuthSecret = isset($responseObject[self::OAUTH_TOKEN]) ? $responseObject[self::OAUTH_TOKEN_SECRET] : '';
 
-        return $return;
+        return $accessToken;
     }
 
     /**
@@ -98,28 +104,10 @@ class MasterpassService
      */
     public function getRequestTokenAndRedirectUrl($acceptableCards, $checkoutProjectId, $xmlVersion, $shippingSuppression, $rewardsProgram, $authLevelBasic, $shippingLocationProfile, $walletSelector)
     {
-        $return = $this->getRequestToken();
-        $return->redirectUrl = $this->getConsumerSignInUrl($acceptableCards, $checkoutProjectId, $xmlVersion, $shippingSuppression, $rewardsProgram, $authLevelBasic, $shippingLocationProfile, $walletSelector);
+        $requestToken = $this->getRequestToken();
+        $requestToken->redirectUrl = $this->getConsumerSignInUrl($acceptableCards, $checkoutProjectId, $xmlVersion, $shippingSuppression, $rewardsProgram, $authLevelBasic, $shippingLocationProfile, $walletSelector);
 
-        return $return;
-    }
-
-    /**
-     * Method used to parse the connection response and return a array of the data.
-     *
-     * @param $responseString
-     *
-     * @return array with all response parameters
-     */
-    public function parseConnectionResponse($responseString)
-    {
-        $token = array();
-        foreach (explode(Connector::AMP, $responseString) as $p) {
-            @list($name, $value) = explode(Connector::EQUALS, $p, 2);
-            $token[$name] = urldecode($value);
-        }
-
-        return $token;
+        return $requestToken;
     }
 
     /**
@@ -127,9 +115,10 @@ class MasterpassService
      * This method posts the Shopping Cart data to MasterCard services
      * and is used to display the shopping cart in the wallet site.
      *
-     * @param $ShoppingCartXml
+     * @param RequestTokenResponse $requestToken
+     * @param string               $shoppingCartXml
      *
-     * @return Output is the response from MasterCard services
+     * @return string The XML response from MasterCard services
      */
     public function postShoppingCartData(RequestTokenResponse $requestToken, $shoppingCartXml)
     {
@@ -142,9 +131,8 @@ class MasterpassService
         $params = array(
             Connector::OAUTH_BODY_HASH => $this->connector->generateBodyHash($newShoppingCartXml),
         );
-        $response = $this->connector->doShoppingCart($params, $newShoppingCartXml);
 
-        return $response;
+        return $this->connector->doShoppingCart($params, $newShoppingCartXml);
     }
 
     /**
@@ -152,10 +140,10 @@ class MasterpassService
      * This method retrieves the payment and shipping information
      * for the current user/session.
      *
-     * @param mixed $accessToken
-     * @param mixed $checkoutResourceUrl
+     * @param string $checkoutResourceUrl
+     * @param string $accessToken
      *
-     * @return Output is the Checkout XML string containing the users billing and shipping information
+     * @return string The Checkout XML string containing the users billing and shipping information
      */
     public function getPaymentShippingResource($checkoutResourceUrl, $accessToken)
     {
@@ -163,38 +151,41 @@ class MasterpassService
             self::OAUTH_TOKEN => $accessToken,
         );
 
-        $response = $this->connector->doRequest($params, $checkoutResourceUrl, Connector::GET, null);
-
-        return $response;
+        return $this->connector->doRequest($params, $checkoutResourceUrl, Connector::GET, null);
     }
 
     /**
      * This method submits the receipt transaction list to MasterCard as a final step
      * in the Wallet process.
      *
-     * @param $merchantTransactions
+     * @param string $postBackUrl
+     * @param string $merchantTransactions
      *
-     * @return Output is the response from MasterCard services
+     * @return string The XML response from MasterCard services
      */
-    public function postCheckoutTransaction($postbackurl, $merchantTransactions)
+    public function postCheckoutTransaction($postBackUrl, $merchantTransactions)
     {
         $params = array(
             Connector::OAUTH_BODY_HASH => $this->connector->generateBodyHash($merchantTransactions),
         );
 
-        $response = $this->connector->doRequest($params, $postbackurl, Connector::POST, $merchantTransactions);
-
-        return $response;
+        return $this->connector->doRequest($params, $postBackUrl, Connector::POST, $merchantTransactions);
     }
 
+    /**
+     * @param string $preCheckoutUrl
+     * @param string $preCheckoutXml
+     * @param string $accessToken
+     *
+     * @return string The XML response from MasterCard services
+     */
     public function getPreCheckoutData($preCheckoutUrl, $preCheckoutXml, $accessToken)
     {
         $params = array(
             self::OAUTH_TOKEN => $accessToken,
         );
-        $response = $this->connector->doRequest($params, $preCheckoutUrl, Connector::POST, $preCheckoutXml);
 
-        return $response;
+        return $this->connector->doRequest($params, $preCheckoutUrl, Connector::POST, $preCheckoutXml);
     }
 
     /**
@@ -212,17 +203,16 @@ class MasterpassService
         $response = $this->connector->doRequestToken($params, null);
         $requestTokenInfo = $this->parseConnectionResponse($response);
 
-        $return = new RequestTokenResponse();
-        $return->requestToken = isset($requestTokenInfo[self::OAUTH_TOKEN]) ? $requestTokenInfo[self::OAUTH_TOKEN] : '';
-        $return->authorizeUrl = isset($requestTokenInfo[self::XOAUTH_REQUEST_AUTH_URL]) ? $requestTokenInfo[self::XOAUTH_REQUEST_AUTH_URL] : '';
-        $return->callbackConfirmed = isset($requestTokenInfo[self::OAUTH_CALLBACK_CONFIRMED]) ? $requestTokenInfo[self::OAUTH_CALLBACK_CONFIRMED] : '';
-        $return->oAuthExpiresIn = isset($requestTokenInfo[self::OAUTH_EXPIRES_IN]) ? $requestTokenInfo[self::OAUTH_EXPIRES_IN] : '';
-        $return->oAuthSecret = isset($requestTokenInfo[self::OAUTH_TOKEN_SECRET]) ? $requestTokenInfo[self::OAUTH_TOKEN_SECRET] : '';
+        $requestToken = new RequestTokenResponse();
+        $requestToken->requestToken = isset($requestTokenInfo[self::OAUTH_TOKEN]) ? $requestTokenInfo[self::OAUTH_TOKEN] : '';
+        $requestToken->authorizeUrl = isset($requestTokenInfo[self::XOAUTH_REQUEST_AUTH_URL]) ? $requestTokenInfo[self::XOAUTH_REQUEST_AUTH_URL] : '';
+        $requestToken->callbackConfirmed = isset($requestTokenInfo[self::OAUTH_CALLBACK_CONFIRMED]) ? $requestTokenInfo[self::OAUTH_CALLBACK_CONFIRMED] : '';
+        $requestToken->oAuthExpiresIn = isset($requestTokenInfo[self::OAUTH_EXPIRES_IN]) ? $requestTokenInfo[self::OAUTH_EXPIRES_IN] : '';
+        $requestToken->oAuthSecret = isset($requestTokenInfo[self::OAUTH_TOKEN_SECRET]) ? $requestTokenInfo[self::OAUTH_TOKEN_SECRET] : '';
 
-        $this->requestTokenInfo = $return;
+        $this->requestToken = $requestToken;
 
-        // Return the request token response class.
-        return $return;
+        return $requestToken;
     }
 
     /**
@@ -242,10 +232,16 @@ class MasterpassService
      * @param $walletSelector
      *
      * @return string - URL to redirect the user to the Masterpass wallet site
+     *
+     * @throws \Exception
      */
     private function getConsumerSignInUrl($acceptableCards, $checkoutProjectId, $xmlVersion, $shippingSuppression, $rewardsProgram, $authLevelBasic, $shippingLocationProfile, $walletSelector)
     {
-        $baseAuthUrl = $this->requestTokenInfo->authorizeUrl;
+        if (null === $this->requestToken) {
+            throw new \Exception('RequestToken is not known');
+        }
+
+        $baseAuthUrl = $this->requestToken->authorizeUrl;
 
         $xmlVersion = strtolower($xmlVersion);
 
@@ -254,7 +250,7 @@ class MasterpassService
             $xmlVersion = self::DEFAULT_XMLVERSION;
         }
 
-        $token = $this->requestTokenInfo->requestToken;
+        $token = $this->requestToken->requestToken;
         if ($token == null || $token == Connector::EMPTY_STRING) {
             throw new \Exception(Connector::EMPTY_REQUEST_TOKEN_ERROR_MESSAGE);
         }
@@ -297,6 +293,24 @@ class MasterpassService
     }
 
     /**
+     * Method used to parse the connection response and return a array of the data.
+     *
+     * @param $responseString
+     *
+     * @return array with all response parameters
+     */
+    private function parseConnectionResponse($responseString)
+    {
+        $token = array();
+        foreach (explode(Connector::AMP, $responseString) as $p) {
+            @list($name, $value) = explode(Connector::EQUALS, $p, 2);
+            $token[$name] = urldecode($value);
+        }
+
+        return $token;
+    }
+
+    /**
      * SDK:
      * Method to create the URL with GET Parameters.
      *
@@ -318,13 +332,5 @@ class MasterpassService
         $paramString .= $key.Connector::EQUALS.$value;
 
         return $paramString;
-    }
-
-    public function parseCallback(\Symfony\Component\HttpFoundation\Request $request)
-    {
-        $request->get('mpstatus');
-        $request->get('checkout_resource_url', null);
-        $request->get('oauth_verifier', null);
-        $request->get('oauth_token', null);
     }
 }
