@@ -178,7 +178,7 @@ class Connector
      */
     public function doRequest($params, $url, $requestMethod, $body = null)
     {
-        if ($body != null) {
+        if ($body !== null) {
             $params[self::OAUTH_BODY_HASH] = $this->generateBodyHash($body);
         }
 

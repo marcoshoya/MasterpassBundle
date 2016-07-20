@@ -15,7 +15,7 @@ class MasterpassHelper
 
     public static function formatXML($resources)
     {
-        if ($resources != null) {
+        if ($resources !== null) {
             $dom = new \DOMDocument();
             $dom->preserveWhiteSpace = false;
             $dom->loadXML($resources);
@@ -43,7 +43,7 @@ class MasterpassHelper
      * Method to extract the URL parameters and add them to the params array.
      * 
      * @param string $urlMap
-     * @param string $params
+     * @param array $params
      * 
      * @return mixed
      */
