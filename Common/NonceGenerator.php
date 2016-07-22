@@ -12,7 +12,7 @@ class NonceGenerator
      *
      * Addendum: The old code for nonce generation was basically this:
      *
-     *      return substr($u, md5(uniqid('nonce_', true)), 16);
+     *      return substr(md5(uniqid('nonce_', true)), 0, 16);
      *
      * Since it produced 16 char long strings of "random" hex data, this
      * new implementation returns strings that look exactly the same but are

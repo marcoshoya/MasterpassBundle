@@ -43,7 +43,7 @@ class MasterpassHelper
      * Method to extract the URL parameters and add them to the params array.
      * 
      * @param string $urlMap
-     * @param array $params
+     * @param array  $params
      * 
      * @return mixed
      */
