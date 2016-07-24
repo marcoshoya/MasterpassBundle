@@ -19,6 +19,8 @@ class MasterpassController extends Controller
      */
     public function indexAction()
     {
+        $service = $this->get('hoya_masterpass_service');
+        
         return array();
     }
 }

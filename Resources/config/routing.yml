@@ -1,4 +1,0 @@
-hoya_masterpass:
-    resource: "@HoyaMasterpassBundle/Controller/"
-    type:      annotation
-    prefix:    /masterpass
