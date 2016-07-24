@@ -5,6 +5,7 @@ namespace Hoya\MasterpassBundle\Service;
 use Hoya\MasterpassBundle\Common\Connector;
 use Hoya\MasterpassBundle\DTO\AccessTokenResponse;
 use Hoya\MasterpassBundle\DTO\RequestTokenResponse;
+use Hoya\MasterpassBundle\DTO\CallbackResponse;
 
 class MasterpassService
 {
@@ -80,15 +81,15 @@ class MasterpassService
      *
      * @return AccessTokenResponse
      */
-    public function getAccessToken($requestToken, $verifier)
+    public function getAccessToken(CallbackResponse $callback)
     {
         $params = array(
-            self::OAUTH_VERIFIER => $verifier,
-            self::OAUTH_TOKEN => $requestToken,
+            self::OAUTH_VERIFIER => $callback->requestVerifier,
+            self::OAUTH_TOKEN => $callback->requestToken,
         );
 
         $accessToken = new AccessTokenResponse();
-        $response = $this->connector->doAccessToken($params, null);
+        $response = $this->connector->doAccessToken($params);
         $responseObject = $this->parseConnectionResponse($response);
 
         $accessToken->accessToken = isset($responseObject[self::OAUTH_TOKEN]) ? $responseObject[self::OAUTH_TOKEN] : '';
@@ -361,5 +362,21 @@ class MasterpassService
     public function getErrorMessage()
     {
         return $this->connector->errorMessage;
+    }
+    
+    /**
+     * Handle callback
+     * 
+     * @param \Symfony\Component\HttpFoundation\Request $request
+     * @return CallbackResponse
+     */
+    public function handleCallback(\Symfony\Component\HttpFoundation\Request $request)
+    {
+        $callback = new CallbackResponse;
+        $callback->requestToken = $request->get(self::OAUTH_TOKEN);
+        $callback->requestVerifier = $request->get(self::OAUTH_VERIFIER);
+        $callback->checkoutResourceUrl = $request->get(self::CHECKOUT_RESOURCE_URL);
+        
+        return $callback;
     }
 }
