@@ -7,9 +7,10 @@ class URL
     const REQUESTURL = 'api.mastercard.com/oauth/consumer/v1/request_token';
     const SHOPPINGCARTURL = 'api.mastercard.com/masterpass/v6/shopping-cart';
     const ACCESSURL = 'api.mastercard.com/oauth/consumer/v1/access_token';
-    const SBX_POSTBACKURL = 'api.mastercard.com/masterpass/v6/transaction';
-    const SBX_PRECHECKOUTURL = 'api.mastercard.com/masterpass/v6/precheckout';
-    const SBX_MERCHANTINITURL = 'api.mastercard.com/masterpass/v6/merchant-initialization';
+    const POSTBACKURL = 'api.mastercard.com/masterpass/v6/transaction';
+    const PRECHECKOUTURL = 'api.mastercard.com/masterpass/v6/precheckout';
+    const MERCHANTINITURL = 'api.mastercard.com/masterpass/v6/merchant-initialization';
+    const LIGHTBOXURL = 'masterpass.com/lightbox/Switch/integration/MasterPass.client.js';
 
     /**
      * @var bool
@@ -77,6 +78,16 @@ class URL
     public function getAccessUrl()
     {
         return $this->buildUrl(self::ACCESSURL);
+    }
+    
+    /**
+     * Get lightbox url
+     * 
+     * @return string
+     */
+    public function getLightboxUrl()
+    {
+        return $this->buildUrl(self::LIGHTBOXURL);
     }
 
     /**
