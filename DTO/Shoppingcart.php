@@ -2,23 +2,20 @@
 
 namespace Hoya\MasterpassBundle\DTO;
 
-use Hoya\MasterpassBundle\DTO\ShoppingcartItem;
-
 /**
- * Shoppingcart DTO
+ * Shoppingcart DTO.
  *
  * @author Marcos Lazarin <marcoshoya at gmail dot com>
  */
 class Shoppingcart implements \IteratorAggregate
 {
-
     /**
-     * @var string 
+     * @var string
      */
     public $currency;
 
     /**
-     * @var array 
+     * @var array
      */
     private $itemList = [];
 
@@ -35,9 +32,10 @@ class Shoppingcart implements \IteratorAggregate
     }
 
     /**
-     * Get shoppincart item
+     * Get shoppincart item.
      * 
-     * @param integer $idx
+     * @param int $idx
+     *
      * @return \Hoya\MasterpassBundle\DTO\ShoppingcartItem
      */
     public function getItem($idx)
@@ -46,9 +44,9 @@ class Shoppingcart implements \IteratorAggregate
     }
 
     /**
-     * Add shoppincart item
+     * Add shoppincart item.
      * 
-     * @param integer $idx
+     * @param int              $idx
      * @param ShoppingcartItem $item
      */
     public function addItem($idx, ShoppingcartItem $item)
@@ -59,7 +57,7 @@ class Shoppingcart implements \IteratorAggregate
     }
 
     /**
-     * Remove shoppincart item
+     * Remove shoppincart item.
      * 
      * @param ShoppingcartItem $item
      */
@@ -69,7 +67,7 @@ class Shoppingcart implements \IteratorAggregate
     }
 
     /**
-     * Get all shoppincart items
+     * Get all shoppincart items.
      * 
      * @return array
      */
@@ -79,9 +77,9 @@ class Shoppingcart implements \IteratorAggregate
     }
 
     /**
-     * Count shoppincart items
+     * Count shoppincart items.
      * 
-     * @return integer
+     * @return int
      */
     public function countItem()
     {
@@ -89,9 +87,9 @@ class Shoppingcart implements \IteratorAggregate
     }
 
     /**
-     * Get shopping-cart amount
+     * Get shopping-cart amount.
      * 
-     * @return integer
+     * @return int
      */
     public function getAmount()
     {
@@ -106,26 +104,26 @@ class Shoppingcart implements \IteratorAggregate
     }
 
     /**
-     * ToXml shoppingcart
+     * ToXml shoppingcart.
      * 
      * @return string
      */
     public function toXML()
     {
         $domtree = new \DOMDocument('1.0', 'UTF-8');
-        $xmlrequest = $domtree->createElement("ShoppingCartRequest");
-        $xmlrequest->appendChild($domtree->createElement("OAuthToken"));
-        $xmlcart = $domtree->createElement("ShoppingCart");
-        $xmlcart->appendChild($domtree->createElement("CurrencyCode", $this->currency));
-        $xmlcart->appendChild($domtree->createElement("Subtotal", $this->getAmount()));
+        $xmlrequest = $domtree->createElement('ShoppingCartRequest');
+        $xmlrequest->appendChild($domtree->createElement('OAuthToken'));
+        $xmlcart = $domtree->createElement('ShoppingCart');
+        $xmlcart->appendChild($domtree->createElement('CurrencyCode', $this->currency));
+        $xmlcart->appendChild($domtree->createElement('Subtotal', $this->getAmount()));
 
         if ($this->countItem()) {
             foreach ($this->allItem() as $item) {
-                $xmlitem = $domtree->createElement("ShoppingCartItem");
-                $xmlitem->appendChild($domtree->createElement("Description", $item->description));
-                $xmlitem->appendChild($domtree->createElement("Quantity", $item->quantity));
-                $xmlitem->appendChild($domtree->createElement("Value", $item->getAmount()));
-                $xmlitem->appendChild($domtree->createElement("ImageURL", $item->imageUrl));
+                $xmlitem = $domtree->createElement('ShoppingCartItem');
+                $xmlitem->appendChild($domtree->createElement('Description', $item->description));
+                $xmlitem->appendChild($domtree->createElement('Quantity', $item->quantity));
+                $xmlitem->appendChild($domtree->createElement('Value', $item->getAmount()));
+                $xmlitem->appendChild($domtree->createElement('ImageURL', $item->imageUrl));
                 $xmlcart->appendChild($xmlitem);
             }
         }
@@ -135,5 +133,4 @@ class Shoppingcart implements \IteratorAggregate
 
         return $domtree->saveXML();
     }
-
 }
