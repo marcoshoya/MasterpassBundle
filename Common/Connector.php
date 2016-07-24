@@ -68,6 +68,8 @@ class Connector
     private $version = '1.0';
     private $signatureMethod = 'RSA-SHA1';
     public $realm = 'eWallet'; // This value is static
+    
+    public $errorMessage = null;
 
     /**
      * @param URL   $url
@@ -184,7 +186,7 @@ class Connector
         try {
             return $this->connect($params, $this->realm, $url, $requestMethod, $body);
         } catch (\Exception $e) {
-            throw $this->checkForErrors($e);
+            $this->errorMessage = $this->checkForErrors($e);
         }
     }
 
@@ -390,9 +392,9 @@ class Connector
         if (strpos($e->getMessage(), self::HTML_TAG) !== false) {
             $body = substr($e->getMessage(), strpos($e->getMessage(), self::HTML_BODY_OPEN) + 6, strpos($e->getMessage(), self::HTML_BODY_CLOSE));
 
-            return new \Exception($body);
+            return $body;
         } else {
-            return $e;
+            return MasterpassHelper::formatXML($e->getMessage());
         }
     }
 }

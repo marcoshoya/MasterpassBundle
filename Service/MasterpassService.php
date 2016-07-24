@@ -343,4 +343,23 @@ class MasterpassService
 
         return $paramString;
     }
+    
+    /**
+     * Check for errors
+     * @return boolean
+     */
+    public function hasError()
+    {
+        return $this->connector->errorMessage !== null ? true : false;
+    }
+    
+    /**
+     * Get error message
+     * 
+     * @return string
+     */
+    public function getErrorMessage()
+    {
+        return $this->connector->errorMessage;
+    }
 }
