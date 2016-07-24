@@ -59,6 +59,16 @@ class MasterpassService
         $this->connector = $connector;
         $this->requestToken = null;
     }
+    
+    /**
+     * Get connector
+     * 
+     * @return Hoya\MasterpassBundle\Common\Connector
+     */
+    public function getConnector()
+    {
+        return $this->connector;
+    }
 
     /**
      * SDK:
