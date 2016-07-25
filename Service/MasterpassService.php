@@ -155,9 +155,9 @@ class MasterpassService
      */
     public function getCheckoutData(AccessTokenResponse $accessToken)
     {
-        $params = array(self::OAUTH_TOKEN => $accessToken);
+        $params = array(self::OAUTH_TOKEN => $accessToken->accessToken);
 
-        return $this->connector->doRequest($params, $accessToken->checkoutResourceUrl, Connector::GET);
+        return $this->connector->doCheckoutData($params, $accessToken->checkoutResourceUrl);
     }
 
     /**

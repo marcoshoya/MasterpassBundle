@@ -164,6 +164,17 @@ class Connector
     {
         return $this->doRequest($params, $this->urlService->getRequestUrl(), self::POST, $body);
     }
+    
+    /**
+     * 
+     * @param type $params
+     * @param type $url
+     * @return type
+     */
+    public function doCheckoutData($params, $url)
+    {
+        return $this->doRequest($params, $url, self::GET);
+    }
 
     /**
      *  Method used for all Http connections.
