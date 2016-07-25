@@ -9,15 +9,14 @@ use Hoya\MasterpassBundle\DTO\CallbackResponse;
 
 class MasterpassService
 {
+
     //Request Token Response
     const XOAUTH_REQUEST_AUTH_URL = 'xoauth_request_auth_url';
     const OAUTH_CALLBACK_CONFIRMED = 'oauth_callback_confirmed';
     const OAUTH_EXPIRES_IN = 'oauth_expires_in';
-
     //Request Token Response
     const OAUTH_TOKEN_SECRET = 'oauth_token_secret';
     const ORIGIN_URL = 'origin_url';
-
     // Callback URL parameters
     const OAUTH_TOKEN = 'oauth_token';
     const OAUTH_VERIFIER = 'oauth_verifier';
@@ -25,7 +24,6 @@ class MasterpassService
     const REDIRECT_URL = 'redirect_url';
     const PAIRING_TOKEN = 'pairing_token';
     const PAIRING_VERIFIER = 'pairing_verifier';
-
     // Redirect Parameters
     const CHECKOUT_IDENTIFIER = 'checkout_identifier';
     const ACCEPTABLE_CARDS = 'acceptable_cards';
@@ -60,7 +58,7 @@ class MasterpassService
         $this->connector = $connector;
         $this->requestToken = null;
     }
-    
+
     /**
      * Get connector
      * 
@@ -94,6 +92,7 @@ class MasterpassService
 
         $accessToken->accessToken = isset($responseObject[self::OAUTH_TOKEN]) ? $responseObject[self::OAUTH_TOKEN] : '';
         $accessToken->oAuthSecret = isset($responseObject[self::OAUTH_TOKEN]) ? $responseObject[self::OAUTH_TOKEN_SECRET] : '';
+        $accessToken->checkoutResourceUrl = $callback->checkoutResourceUrl;
 
         return $accessToken;
     }
@@ -147,22 +146,18 @@ class MasterpassService
     }
 
     /**
-     * SDK:
      * This method retrieves the payment and shipping information
      * for the current user/session.
-     *
-     * @param string $checkoutResourceUrl
-     * @param string $accessToken
-     *
+
+     * @param AccessTokenResponse $accessToken
+     * 
      * @return string The Checkout XML string containing the users billing and shipping information
      */
-    public function getPaymentShippingResource($checkoutResourceUrl, $accessToken)
+    public function getCheckoutData(AccessTokenResponse $accessToken)
     {
-        $params = array(
-            self::OAUTH_TOKEN => $accessToken,
-        );
+        $params = array(self::OAUTH_TOKEN => $accessToken);
 
-        return $this->connector->doRequest($params, $checkoutResourceUrl, Connector::GET, null);
+        return $this->connector->doRequest($params, $accessToken->checkoutResourceUrl, Connector::GET);
     }
 
     /**
@@ -271,32 +266,32 @@ class MasterpassService
         }
 
         // construct the Redirect URL
-        $finalAuthUrl = $baseAuthUrl.
-            $this->getParamString(self::ACCEPTABLE_CARDS, $acceptableCards, true).
-            $this->getParamString(self::CHECKOUT_IDENTIFIER, $checkoutProjectId).
-            $this->getParamString(self::OAUTH_TOKEN, $token).
-            $this->getParamString(self::VERSION, $xmlVersion);
+        $finalAuthUrl = $baseAuthUrl .
+                $this->getParamString(self::ACCEPTABLE_CARDS, $acceptableCards, true) .
+                $this->getParamString(self::CHECKOUT_IDENTIFIER, $checkoutProjectId) .
+                $this->getParamString(self::OAUTH_TOKEN, $token) .
+                $this->getParamString(self::VERSION, $xmlVersion);
 
         // If xmlVersion is v1 (default version), then shipping suppression, rewardsprogram and auth_level are not used
         if (strcasecmp($xmlVersion, self::DEFAULT_XMLVERSION) != Connector::V1) {
             if ($shippingSuppression == 'true') {
-                $finalAuthUrl = $finalAuthUrl.$this->getParamString(self::SUPPRESS_SHIPPING_ADDRESS, $shippingSuppression);
+                $finalAuthUrl = $finalAuthUrl . $this->getParamString(self::SUPPRESS_SHIPPING_ADDRESS, $shippingSuppression);
             }
 
             if ((int) substr($xmlVersion, 1) >= 4 && $rewardsProgram == 'true') {
-                $finalAuthUrl = $finalAuthUrl.$this->getParamString(self::ACCEPT_REWARDS_PROGRAM, $rewardsProgram);
+                $finalAuthUrl = $finalAuthUrl . $this->getParamString(self::ACCEPT_REWARDS_PROGRAM, $rewardsProgram);
             }
 
             if ($authLevelBasic) {
-                $finalAuthUrl = $finalAuthUrl.$this->getParamString(self::AUTH_LEVEL, self::BASIC);
+                $finalAuthUrl = $finalAuthUrl . $this->getParamString(self::AUTH_LEVEL, self::BASIC);
             }
 
             if ((int) substr($xmlVersion, 1) >= 4 && $shippingLocationProfile != null && !empty($shippingLocationProfile)) {
-                $finalAuthUrl = $finalAuthUrl.$this->getParamString(self::SHIPPING_LOCATION_PROFILE, $shippingLocationProfile);
+                $finalAuthUrl = $finalAuthUrl . $this->getParamString(self::SHIPPING_LOCATION_PROFILE, $shippingLocationProfile);
             }
 
             if ((int) substr($xmlVersion, 1) >= 5 && $walletSelector == 'true') {
-                $finalAuthUrl = $finalAuthUrl.$this->getParamString(self::WALLET_SELECTOR, $walletSelector);
+                $finalAuthUrl = $finalAuthUrl . $this->getParamString(self::WALLET_SELECTOR, $walletSelector);
             }
         }
 
@@ -340,11 +335,11 @@ class MasterpassService
         } else {
             $paramString .= Connector::AMP;
         }
-        $paramString .= $key.Connector::EQUALS.$value;
+        $paramString .= $key . Connector::EQUALS . $value;
 
         return $paramString;
     }
-    
+
     /**
      * Check for errors
      * @return boolean
@@ -353,7 +348,7 @@ class MasterpassService
     {
         return $this->connector->errorMessage !== null ? true : false;
     }
-    
+
     /**
      * Get error message
      * 
@@ -363,7 +358,7 @@ class MasterpassService
     {
         return $this->connector->errorMessage;
     }
-    
+
     /**
      * Handle callback
      * 
@@ -376,7 +371,8 @@ class MasterpassService
         $callback->requestToken = $request->get(self::OAUTH_TOKEN);
         $callback->requestVerifier = $request->get(self::OAUTH_VERIFIER);
         $callback->checkoutResourceUrl = $request->get(self::CHECKOUT_RESOURCE_URL);
-        
+
         return $callback;
     }
+
 }
