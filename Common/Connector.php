@@ -149,9 +149,9 @@ class Connector
      *
      * @return string
      */
-    public function doAccessToken($params, $body)
+    public function doAccessToken($params)
     {
-        return $this->doRequest($params, $this->urlService->getAccessUrl(), self::POST, $body);
+        return $this->doRequest($params, $this->urlService->getAccessUrl(), self::POST);
     }
 
     /**

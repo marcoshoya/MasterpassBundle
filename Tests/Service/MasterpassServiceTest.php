@@ -7,6 +7,7 @@ use Hoya\MasterpassBundle\Tests\BaseWebTestCase;
 use Hoya\MasterpassBundle\DTO\RequestTokenResponse;
 use Hoya\MasterpassBundle\DTO\Shoppingcart;
 use Hoya\MasterpassBundle\DTO\ShoppingcartItem;
+use Hoya\MasterpassBundle\DTO\CallbackResponse;
 use Hoya\MasterpassBundle\Service\MasterpassService;
 
 /**
@@ -77,6 +78,11 @@ class MasterpassServiceTest extends BaseWebTestCase
 
         return $cartXml;
     }
+    
+    public function testHandleCallback()
+    {
+        //oauth_token=500f3cab67f49658f106e7601a0b06246c97b5be&oauth_verifier=d3d5da6c404b3e76a0104ae8398d7b5bc76b266b&checkoutId=446152630&checkout_resource_url=https%3A%2F%2Fsandbox.api.mastercard.com%2Fmasterpass%2Fv6%2Fcheckout%2F446152630&mpstatus=success
+    }
 
     /**
      * Test access token return.
@@ -89,10 +95,11 @@ class MasterpassServiceTest extends BaseWebTestCase
 
         $service = new MasterpassService($connector);
 
-        $verifier = '8f55989fa03a6dbe173749d0c495872f4a38d84c';
-        $request = '259f063894e0a1ab8996f805bbbeeab535812d6f';
+        $callback = new CallbackResponse;
+        $callback->requestVerifier = '8f55989fa03a6dbe173749d0c495872f4a38d84c';
+        $callback->requestToken = '259f063894e0a1ab8996f805bbbeeab535812d6f';
 
-        $accessTokenResponse = $service->getAccessToken($request, $verifier);
+        $accessTokenResponse = $service->getAccessToken($callback);
         $this->assertInstanceOf('\Hoya\MasterpassBundle\DTO\AccessTokenResponse', $accessTokenResponse);
     }
 
