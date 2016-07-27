@@ -255,7 +255,7 @@ class Connector
     {
         $params = array_merge($this->oAuthParametersFactory(), $params);
 
-        $signature = $this->generateAndSignSignature($params, $url, $requestMethod, $this->privateKey);
+        $signature = $this->generateAndSignSignature($params, $url, $requestMethod);
 
         $params[self::OAUTH_SIGNATURE] = $signature;
 
@@ -279,17 +279,16 @@ class Connector
      * @param array  $params
      * @param string $url
      * @param string $requestMethod
-     * @param string $privateKey
      * 
      * @return string
      */
-    private function generateAndSignSignature($params, $url, $requestMethod, $privateKey)
+    private function generateAndSignSignature($params, $url, $requestMethod)
     {
         $baseString = $this->generateBaseString($params, $url, $requestMethod);
 
         $this->signatureBaseString = $baseString;
 
-        $signature = $this->sign($baseString, $privateKey);
+        $signature = $this->sign($baseString);
 
         return $signature;
     }
@@ -298,16 +297,15 @@ class Connector
      * Method to sign string.
      * 
      * @param string $string
-     * @param string $privateKey
      * 
      * @return string
      */
-    private function sign($string, $privateKey)
+    private function sign($string)
     {
-        $privatekeyid = openssl_get_privatekey($privateKey);
+        $privateKeyId = openssl_get_privatekey($this->privateKey);
 
         $signature = null;
-        openssl_sign($string, $signature, $privatekeyid, OPENSSL_ALGO_SHA1);
+        openssl_sign($string, $signature, $privateKeyId, OPENSSL_ALGO_SHA1);
 
         return base64_encode($signature);
     }
