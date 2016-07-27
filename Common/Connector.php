@@ -166,14 +166,29 @@ class Connector
     }
     
     /**
+     * doCheckoutData
      * 
-     * @param type $params
-     * @param type $url
-     * @return type
+     * @param array $params
+     * @param string $url
+     * 
+     * @return string
      */
     public function doCheckoutData($params, $url)
     {
         return $this->doRequest($params, $url, self::GET);
+    }
+    
+    /**
+     * doTransaction
+     * 
+     * @param array $params
+     * @param string $body
+     * 
+     * @return string
+     */
+    public function doTransaction($params, $body)
+    {
+        return $this->doRequest($params, $this->urlService->getTransactionUrl(), self::POST, $body);
     }
 
     /**

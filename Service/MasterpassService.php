@@ -6,6 +6,7 @@ use Hoya\MasterpassBundle\Common\Connector;
 use Hoya\MasterpassBundle\DTO\AccessTokenResponse;
 use Hoya\MasterpassBundle\DTO\RequestTokenResponse;
 use Hoya\MasterpassBundle\DTO\CallbackResponse;
+use Hoya\MasterpassBundle\DTO\Transaction;
 
 class MasterpassService
 {
@@ -164,18 +165,18 @@ class MasterpassService
      * This method submits the receipt transaction list to MasterCard as a final step
      * in the Wallet process.
      *
-     * @param string $postBackUrl
-     * @param string $merchantTransactions
+     * @param Transaction $transaction
      *
      * @return string The XML response from MasterCard services
      */
-    public function postCheckoutTransaction($postBackUrl, $merchantTransactions)
+    public function postTransaction(Transaction $transaction)
     {
+        $xmlTransaction = $transaction->toXML();
         $params = array(
-            Connector::OAUTH_BODY_HASH => $this->connector->generateBodyHash($merchantTransactions),
+            Connector::OAUTH_BODY_HASH => $this->connector->generateBodyHash($xmlTransaction),
         );
 
-        return $this->connector->doRequest($params, $postBackUrl, Connector::POST, $merchantTransactions);
+        return $this->connector->doTransaction($params, $xmlTransaction);
     }
 
     /**
