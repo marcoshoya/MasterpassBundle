@@ -99,7 +99,7 @@ class Transaction
         $transaction->appendChild($domtree->createElement('ConsumerKey', $this->consumerKey));
         $transaction->appendChild($domtree->createElement('Currency', $this->currency));
         $transaction->appendChild($domtree->createElement('OrderAmount', $this->getAmount()));
-        $transaction->appendChild($domtree->createElement('PurchaseDate', $this->getPurchaseDate()->format('Y-m-d h:i:s')));
+        $transaction->appendChild($domtree->createElement('PurchaseDate', $this->getPurchaseDate()->format(\DateTime::ATOM)));
         $transaction->appendChild($domtree->createElement('TransactionStatus', $this->transactionStatus));
         $transaction->appendChild($domtree->createElement('ApprovalCode', $this->approvalCode));
 
