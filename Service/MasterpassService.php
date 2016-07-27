@@ -100,29 +100,6 @@ class MasterpassService
 
     /**
      * SDK:
-     * This method gets a request token and constructs the redirect URL.
-     *
-     * @param $acceptableCards
-     * @param $checkoutProjectId
-     * @param $xmlVersion
-     * @param $shippingSuppression
-     * @param $rewardsProgram
-     * @param $authLevelBasic
-     * @param $shippingLocationProfile
-     * @param $walletSelector
-     *
-     * @return RequestTokenResponse
-     */
-    public function getRequestTokenAndRedirectUrl($acceptableCards, $checkoutProjectId, $xmlVersion, $shippingSuppression, $rewardsProgram, $authLevelBasic, $shippingLocationProfile, $walletSelector)
-    {
-        $requestToken = $this->getRequestToken();
-        $requestToken->redirectUrl = $this->getConsumerSignInUrl($acceptableCards, $checkoutProjectId, $xmlVersion, $shippingSuppression, $rewardsProgram, $authLevelBasic, $shippingLocationProfile, $walletSelector);
-
-        return $requestToken;
-    }
-
-    /**
-     * SDK:
      * This method posts the Shopping Cart data to MasterCard services
      * and is used to display the shopping cart in the wallet site.
      *
@@ -223,83 +200,6 @@ class MasterpassService
     }
 
     /**
-     * SDK:
-     * Assuming that all due diligence is done and assuming the presence of an established session,
-     * successful reception of non-empty request token, and absence of any unanticipated
-     * exceptions have been successfully verified, you are ready to go to the authorization
-     * link hosted by MasterCard.
-     *
-     * @param $acceptableCards
-     * @param $checkoutProjectId
-     * @param $xmlVersion
-     * @param $shippingSuppression
-     * @param $rewardsProgram
-     * @param $authLevelBasic
-     * @param $shippingLocationProfile
-     * @param $walletSelector
-     *
-     * @return string - URL to redirect the user to the Masterpass wallet site
-     *
-     * @throws \Exception
-     */
-    private function getConsumerSignInUrl($acceptableCards, $checkoutProjectId, $xmlVersion, $shippingSuppression, $rewardsProgram, $authLevelBasic, $shippingLocationProfile, $walletSelector)
-    {
-        if (null === $this->requestToken) {
-            throw new \Exception('RequestToken is not known');
-        }
-
-        $baseAuthUrl = $this->requestToken->authorizeUrl;
-
-        $xmlVersion = strtolower($xmlVersion);
-
-        // Use v1 if xmlVersion does not match correct patern
-        if (!preg_match(self::XML_VERSION_REGEX, $xmlVersion)) {
-            $xmlVersion = self::DEFAULT_XMLVERSION;
-        }
-
-        $token = $this->requestToken->requestToken;
-        if ($token == null || $token == Connector::EMPTY_STRING) {
-            throw new \Exception(Connector::EMPTY_REQUEST_TOKEN_ERROR_MESSAGE);
-        }
-
-        if ($baseAuthUrl == null || $baseAuthUrl == Connector::EMPTY_STRING) {
-            throw new \Exception(Connector::INVALID_AUTH_URL);
-        }
-
-        // construct the Redirect URL
-        $finalAuthUrl = $baseAuthUrl .
-                $this->getParamString(self::ACCEPTABLE_CARDS, $acceptableCards, true) .
-                $this->getParamString(self::CHECKOUT_IDENTIFIER, $checkoutProjectId) .
-                $this->getParamString(self::OAUTH_TOKEN, $token) .
-                $this->getParamString(self::VERSION, $xmlVersion);
-
-        // If xmlVersion is v1 (default version), then shipping suppression, rewardsprogram and auth_level are not used
-        if (strcasecmp($xmlVersion, self::DEFAULT_XMLVERSION) != Connector::V1) {
-            if ($shippingSuppression == 'true') {
-                $finalAuthUrl = $finalAuthUrl . $this->getParamString(self::SUPPRESS_SHIPPING_ADDRESS, $shippingSuppression);
-            }
-
-            if ((int) substr($xmlVersion, 1) >= 4 && $rewardsProgram == 'true') {
-                $finalAuthUrl = $finalAuthUrl . $this->getParamString(self::ACCEPT_REWARDS_PROGRAM, $rewardsProgram);
-            }
-
-            if ($authLevelBasic) {
-                $finalAuthUrl = $finalAuthUrl . $this->getParamString(self::AUTH_LEVEL, self::BASIC);
-            }
-
-            if ((int) substr($xmlVersion, 1) >= 4 && $shippingLocationProfile != null && !empty($shippingLocationProfile)) {
-                $finalAuthUrl = $finalAuthUrl . $this->getParamString(self::SHIPPING_LOCATION_PROFILE, $shippingLocationProfile);
-            }
-
-            if ((int) substr($xmlVersion, 1) >= 5 && $walletSelector == 'true') {
-                $finalAuthUrl = $finalAuthUrl . $this->getParamString(self::WALLET_SELECTOR, $walletSelector);
-            }
-        }
-
-        return $finalAuthUrl;
-    }
-
-    /**
      * Method used to parse the connection response and return a array of the data.
      *
      * @param $responseString
@@ -315,30 +215,6 @@ class MasterpassService
         }
 
         return $token;
-    }
-
-    /**
-     * SDK:
-     * Method to create the URL with GET Parameters.
-     *
-     * @param $key
-     * @param $value
-     * @param $firstParam
-     *
-     * @return string
-     */
-    private function getParamString($key, $value, $firstParam = false)
-    {
-        $paramString = Connector::EMPTY_STRING;
-
-        if ($firstParam) {
-            $paramString .= Connector::QUESTION;
-        } else {
-            $paramString .= Connector::AMP;
-        }
-        $paramString .= $key . Connector::EQUALS . $value;
-
-        return $paramString;
     }
 
     /**
