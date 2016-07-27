@@ -81,6 +81,36 @@ class URL
     }
     
     /**
+     * Get merchant initialization url
+     * 
+     * @return string
+     */
+    public function getMerchantInitUrl()
+    {
+        return $this->buildUrl(self::MERCHANTINITURL);
+    }
+    
+    /**
+     * Get transaction url
+     * 
+     * @return string
+     */
+    public function getPrecheckoutUrl()
+    {
+        return $this->buildUrl(self::PRECHECKOUTURL);
+    }
+    
+    /**
+     * Get transaction url
+     * 
+     * @return string
+     */
+    public function getTransactionUrl()
+    {
+        return $this->buildUrl(self::POSTBACKURL);
+    }
+    
+    /**
      * Get lightbox url
      * 
      * @return string
@@ -89,7 +119,7 @@ class URL
     {
         return $this->buildUrl(self::LIGHTBOXURL);
     }
-
+    
     /**
      * @return string
      */
