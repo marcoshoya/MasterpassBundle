@@ -18,13 +18,17 @@ class MasterpassService
     //Request Token Response
     const OAUTH_TOKEN_SECRET = 'oauth_token_secret';
     const ORIGIN_URL = 'origin_url';
-    // Callback URL parameters
+    
+// Callback URL parameters
     const OAUTH_TOKEN = 'oauth_token';
     const OAUTH_VERIFIER = 'oauth_verifier';
     const CHECKOUT_RESOURCE_URL = 'checkout_resource_url';
     const REDIRECT_URL = 'redirect_url';
     const PAIRING_TOKEN = 'pairing_token';
     const PAIRING_VERIFIER = 'pairing_verifier';
+    const CHECKOUTID = 'checkoutId';
+    const MPSTATUS = 'mpstatus';
+    
     // Redirect Parameters
     const CHECKOUT_IDENTIFIER = 'checkout_identifier';
     const ACCEPTABLE_CARDS = 'acceptable_cards';
@@ -248,6 +252,8 @@ class MasterpassService
         $callback->requestToken = $request->get(self::OAUTH_TOKEN);
         $callback->requestVerifier = $request->get(self::OAUTH_VERIFIER);
         $callback->checkoutResourceUrl = $request->get(self::CHECKOUT_RESOURCE_URL);
+        $callback->checkoutId = $request->get(self::CHECKOUTID);
+        $callback->mpstatus = $request->get(self::MPSTATUS);
 
         return $callback;
     }

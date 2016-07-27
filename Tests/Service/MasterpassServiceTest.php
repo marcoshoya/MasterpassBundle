@@ -84,7 +84,7 @@ class MasterpassServiceTest extends BaseWebTestCase
 
     public function testHandleCallback()
     {
-        //oauth_token=500f3cab67f49658f106e7601a0b06246c97b5be&oauth_verifier=d3d5da6c404b3e76a0104ae8398d7b5bc76b266b&checkoutId=446152630&checkout_resource_url=https%3A%2F%2Fsandbox.api.mastercard.com%2Fmasterpass%2Fv6%2Fcheckout%2F446152630&mpstatus=success
+        //oauth_token=db5a9e2a443ccf89ed825e6c9c0ef874ebe48097&oauth_verifier=af7bd8e66095828f8cc8c57096583ca848d62793&checkoutId=449087232&checkout_resource_url=https%3A%2F%2Fsandbox.api.mastercard.com%2Fmasterpass%2Fv6%2Fcheckout%2F449087232&mpstatus=success
     }
 
     /**

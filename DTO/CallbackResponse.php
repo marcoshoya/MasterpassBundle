@@ -12,4 +12,6 @@ class CallbackResponse
     public $requestToken;
     public $requestVerifier;
     public $checkoutResourceUrl;
+    public $checkoutId;
+    public $mpstatus;
 }
