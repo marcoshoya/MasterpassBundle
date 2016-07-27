@@ -2,13 +2,13 @@
 
 namespace Hoya\MasterpassBundle\Tests\Service;
 
-use Hoya\MasterpassBundle\Common\Connector;
 use Hoya\MasterpassBundle\Tests\BaseWebTestCase;
 use Hoya\MasterpassBundle\DTO\RequestTokenResponse;
 use Hoya\MasterpassBundle\DTO\Shoppingcart;
 use Hoya\MasterpassBundle\DTO\ShoppingcartItem;
 use Hoya\MasterpassBundle\DTO\CallbackResponse;
 use Hoya\MasterpassBundle\DTO\AccessTokenResponse;
+use Hoya\MasterpassBundle\DTO\Transaction;
 use Hoya\MasterpassBundle\Service\MasterpassService;
 
 /**
@@ -21,6 +21,8 @@ class MasterpassServiceTest extends BaseWebTestCase
     const ACCESSTOKEN = 'doAccessToken';
     
     const CHECKOUTDATA = 'doCheckoutData';
+    
+    const TRANSACTION = 'doTransaction';
 
     /**
      * @return MasterpassService
@@ -161,6 +163,39 @@ XML;
 
         $this->assertRegExp('<Checkout>', $checkoutData, 'Response does not contain Checkout');
         $this->assertRegExp('<TransactionId>', $checkoutData, 'Response does not contain TransactionId');
+    }
+    
+    public function testTransaction()
+    {
+        $return = <<<XML
+<?xml version="1.0" encoding="UTF-8"?>
+<MerchantTransactions>
+   <MerchantTransactions>
+      <TransactionId>449087232</TransactionId>
+      <ConsumerKey>cLb0tKkEJhGTITp_6ltDIibO5Wgbx4rIldeXM_jRd4b0476c!414f4859446c4a366c726a327474695545332b353049303d</ConsumerKey>
+      <Currency>USD</Currency>
+      <OrderAmount>100</OrderAmount>
+      <PurchaseDate>2016-07-27T05:31:45+02:00</PurchaseDate>
+      <TransactionStatus>Success</TransactionStatus>
+      <ApprovalCode>sample</ApprovalCode>
+   </MerchantTransactions>
+</MerchantTransactions>
+XML;
+        $purchase = new \DateTime;
+        $transaction = new Transaction;
+        $transaction->transactionId = 449087232;
+        $transaction->consumerKey = 'cLb0tKkEJhGTITp_6ltDIibO5Wgbx4rIldeXM_jRd4b0476c!414f4859446c4a366c726a327474695545332b353049303d';
+        $transaction->currency = 'USD';
+        $transaction->setAmount(1.00);
+        $transaction->transactionStatus = 'Success';
+        $transaction->setPurchaseDate($purchase);
+        $transaction->approvalCode = 'sample';
+        
+        $connector = $this->getMockConnector($return, self::TRANSACTION);
+        $service = new MasterpassService($connector);
+        
+        $response = $service->postTransaction($transaction);
+        $this->assertRegExp('<TransactionId>', $response, 'Response does not contain TransactionId');
     }
 
 }
