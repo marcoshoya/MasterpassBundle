@@ -55,4 +55,24 @@ class BaseWebTestCase extends WebTestCase
             'default', isset($options['debug']) ? $options['debug'] : true
         );
     }
+    
+    /**
+     * Mock connector service.
+     * 
+     * @param string $return
+     *
+     * @return \PHPUnit_Framework_MockObject_MockObject|Connector
+     */
+    protected function getMockConnector($return, $method)
+    {
+        $mock = $this->getMockBuilder('Hoya\MasterpassBundle\Common\Connector')
+                ->disableOriginalConstructor()
+                ->getMock();
+
+        $mock->expects($this->any())
+                ->method($method)
+                ->will($this->returnValue($return));
+
+        return $mock;
+    }
 }
