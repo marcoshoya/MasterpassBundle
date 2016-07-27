@@ -90,6 +90,16 @@ class Connector
 
         $this->privateKey = $this->getPrivateKey();
     }
+    
+    /**
+     * Returns the consumer key according environment
+     * 
+     * @return string
+     */
+    public function getConsumerKey()
+    {
+        return $this->consumerKey;
+    }
 
     /**
      * @return string
