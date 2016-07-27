@@ -20,7 +20,7 @@ class InMemoryPrivateKey implements PrivateKeyInterface
     /**
      * {@inheritdoc}
      */
-    public function getPrivateKey()
+    public function getContents()
     {
         return $this->privateKey;
     }

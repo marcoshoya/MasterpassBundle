@@ -62,8 +62,6 @@ class Connector
     public $signatureBaseString;
     public $authHeader;
     protected $consumerKey;
-    protected $keystorePath;
-    protected $keystorePassword;
     private $privateKey;
     private $version = '1.0';
     private $signatureMethod = 'RSA-SHA1';
@@ -80,15 +78,18 @@ class Connector
         $this->urlService = $url;
         if ($this->urlService->isProduction()) {
             $this->consumerKey = $keys['production']['consumerkey'];
-            $this->keystorePath = $keys['production']['keystorepath'];
-            $this->keystorePassword = $keys['production']['keystorepassword'];
+            $this->privateKey = new LocalPrivateKey(
+                $keys['production']['keystorepath'],
+                $keys['production']['keystorepassword']
+            );
         } else {
             $this->consumerKey = $keys['sandbox']['consumerkey'];
-            $this->keystorePath = $keys['sandbox']['keystorepath'];
-            $this->keystorePassword = $keys['sandbox']['keystorepassword'];
+            $this->privateKey = new LocalPrivateKey(
+                $keys['sandbox']['keystorepath'],
+                $keys['sandbox']['keystorepassword']
+            );
         }
 
-        $this->privateKey = $this->getPrivateKey();
     }
     
     /**
@@ -115,31 +116,6 @@ class Connector
     public function getCallbackUrl()
     {
         return $this->urlService->getCallbackUrl();
-    }
-
-    /**
-     * Method to retrieve the private key from the p12 file.
-     *
-     * @return string The private key
-     *
-     * @throws \Exception When the private key cannot be retrieved
-     */
-    private function getPrivateKey()
-    {
-        if (!$path = realpath($this->keystorePath)) {
-            throw new \Exception("File {$this->keystorePath} does not exist");
-        }
-
-        if (!$pkcs12 = @file_get_contents($path)) {
-            throw new \Exception("Cert file {$path} cannot be read");
-        }
-
-        $keystore = array();
-        if (!openssl_pkcs12_read($pkcs12, $keystore, $this->keystorePassword)) {
-            throw new \Exception('PKCS12 cannot be decoded');
-        }
-
-        return trim($keystore['pkey']);
     }
 
     /**
@@ -302,7 +278,7 @@ class Connector
      */
     private function sign($string)
     {
-        $privateKeyId = openssl_get_privatekey($this->privateKey);
+        $privateKeyId = openssl_get_privatekey($this->privateKey->getContents());
 
         $signature = null;
         openssl_sign($string, $signature, $privateKeyId, OPENSSL_ALGO_SHA1);

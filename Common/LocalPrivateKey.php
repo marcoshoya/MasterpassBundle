@@ -36,7 +36,7 @@ class LocalPrivateKey implements PrivateKeyInterface
      * @throws \Exception When the keystore file does not exist,
      *                    cannot be read or cannot be decoded.
      */
-    public function getPrivateKey()
+    public function getContents()
     {
         if (null === $this->cachedPrivateKey) {
             $this->cachedPrivateKey = $this->retrievePKFromDisk();
