@@ -2,11 +2,16 @@
 
 namespace Hoya\MasterpassBundle\Common;
 
+/**
+ * The PrivateKeyInterface abstraction allows the implementation
+ * of different strategies for storing and retrieving RSA private
+ * keys while at the same time providing a unified interface to
+ * client code for accessing them.
+ */
 interface PrivateKeyInterface
 {
     /**
-     * This method must return the raw private
-     * key from a PKCS#12 certificate.
+     * This method must return an RSA private key in the PEM format.
      *
      * @return string
      */

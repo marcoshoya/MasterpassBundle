@@ -66,7 +66,7 @@ class Connector
     private $version = '1.0';
     private $signatureMethod = 'RSA-SHA1';
     public $realm = 'eWallet'; // This value is static
-    
+
     public $errorMessage = null;
 
     /**
@@ -89,12 +89,26 @@ class Connector
                 $keys['sandbox']['keystorepassword']
             );
         }
-
     }
-    
+
     /**
-     * Returns the consumer key according environment
-     * 
+     * This method allows the class client to override the
+     * private key passed in the constructor.
+     *
+     * @param PrivateKeyInterface $privateKey
+     *
+     * @return Connector
+     */
+    public function setPrivateKey(PrivateKeyInterface $privateKey)
+    {
+        $this->privateKey = $privateKey;
+
+        return $this;
+    }
+
+    /**
+     * Returns the consumer key according environment.
+     *
      * @return string
      */
     public function getConsumerKey()
@@ -150,26 +164,26 @@ class Connector
     {
         return $this->doRequest($params, $this->urlService->getRequestUrl(), self::POST, $body);
     }
-    
+
     /**
-     * doCheckoutData
-     * 
-     * @param array $params
+     * doCheckoutData.
+     *
+     * @param array  $params
      * @param string $url
-     * 
+     *
      * @return string
      */
     public function doCheckoutData($params, $url)
     {
         return $this->doRequest($params, $url, self::GET);
     }
-    
+
     /**
-     * doTransaction
-     * 
-     * @param array $params
+     * doTransaction.
+     *
+     * @param array  $params
      * @param string $body
-     * 
+     *
      * @return string
      */
     public function doTransaction($params, $body)
@@ -205,9 +219,9 @@ class Connector
     /**
      * SDK:
      * Method to generate the body hash.
-     * 
+     *
      * @param string $body
-     * 
+     *
      * @return string
      */
     public function generateBodyHash($body)
@@ -219,12 +233,12 @@ class Connector
 
     /**
      * Builds a Auth Header used in connection to Masterpass services.
-     * 
+     *
      * @param array  $params
      * @param string $realm
      * @param string $url
      * @param string $requestMethod
-     * 
+     *
      * @return string - Auth header
      */
     private function buildAuthHeaderString($params, $realm, $url, $requestMethod)
@@ -251,11 +265,11 @@ class Connector
 
     /**
      * Method to generate base string and generate the signature.
-     *  
+     *
      * @param array  $params
      * @param string $url
      * @param string $requestMethod
-     * 
+     *
      * @return string
      */
     private function generateAndSignSignature($params, $url, $requestMethod)
@@ -271,28 +285,26 @@ class Connector
 
     /**
      * Method to sign string.
-     * 
+     *
      * @param string $string
-     * 
+     *
      * @return string
      */
     private function sign($string)
     {
-        $privateKeyId = openssl_get_privatekey($this->privateKey->getContents());
-
         $signature = null;
-        openssl_sign($string, $signature, $privateKeyId, OPENSSL_ALGO_SHA1);
+        openssl_sign($string, $signature, $this->privateKey->getContents(), OPENSSL_ALGO_SHA1);
 
         return base64_encode($signature);
     }
 
     /**
      * Method to generate the signature base string.
-     * 
+     *
      * @param array  $params
      * @param string $url
      * @param string $requestMethod
-     * 
+     *
      * @return string
      */
     private function generateBaseString($params, $url, $requestMethod)
@@ -316,7 +328,7 @@ class Connector
 
     /**
      * Method to create all default parameters used in the base string and auth header.
-     * 
+     *
      * @return array
      *
      * @throws \Exception When the consumer key has not been provided to the service
@@ -340,15 +352,15 @@ class Connector
 
     /**
      * General method to handle all HTTP connections.
-     * 
+     *
      * @param array       $params
      * @param string      $realm
      * @param string      $url
      * @param string      $requestMethod
      * @param string|null $body
-     * 
+     *
      * @throws \Exception - If connection fails or receives a HTTP status code > 300
-     * 
+     *
      * @return mixed
      */
     private function connect($params, $realm, $url, $requestMethod, $body = null)
@@ -392,9 +404,9 @@ class Connector
 
     /**
      * Method to check for HTML content in the exception message and remove everything except the body.
-     * 
+     *
      * @param \Exception $e
-     * 
+     *
      * @return \Exception
      */
     private function checkForErrors(\Exception $e)

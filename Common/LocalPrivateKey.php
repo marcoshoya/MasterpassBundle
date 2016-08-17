@@ -2,70 +2,57 @@
 
 namespace Hoya\MasterpassBundle\Common;
 
+/**
+ * The LocalPrivateKey represents a private key stored
+ * in the PKCS#12 format in a file of the local filesystem.
+ */
 class LocalPrivateKey implements PrivateKeyInterface
 {
     /**
-     * @var string
+     * @var EncryptedPrivateKey
      */
-    private $cachedPrivateKey;
+    private $privateKey;
 
     /**
-     * @var string
+     * @param string $keystorePath Path to the PKCS#12 keystore
+     * @param string $passphrase   Passphrase for unlocking the keystore
+     *
+     * @throws \Exception When the keystore file does not exist
+     *                    or cannot be read
      */
-    private $keystorePath;
-
-    /**
-     * @var string
-     */
-    private $keystorePassword;
-
-    /**
-     * @param string $keystorePath
-     * @param string $keystorePassword
-     */
-    public function __construct($keystorePath, $keystorePassword)
+    public function __construct($keystorePath, $passphrase)
     {
-        $this->cachedPrivateKey = null;
-        $this->keystorePath = $keystorePath;
-        $this->keystorePassword = $keystorePassword;
+        $this->privateKey = new EncryptedPrivateKey(
+            $this->retrieveFileContents($keystorePath), $passphrase
+        );
     }
 
     /**
      * {@inheritdoc}
-     *
-     * @throws \Exception When the keystore file does not exist,
-     *                    cannot be read or cannot be decoded.
      */
     public function getContents()
     {
-        if (null === $this->cachedPrivateKey) {
-            $this->cachedPrivateKey = $this->retrievePKFromDisk();
-        }
-
-        return $this->cachedPrivateKey;
+        return $this->privateKey->getContents();
     }
 
     /**
-     * @return string
+     * @param string $path A file path in the local filesystem
      *
-     * @throws \Exception When the keystore file does not exist,
-     *                    cannot be read or cannot be decoded.
+     * @return string The file contents
+     *
+     * @throws \Exception When the keystore file does not exist
+     *                    or cannot be read
      */
-    private function retrievePKFromDisk()
+    private function retrieveFileContents($path)
     {
-        if (!$path = realpath($this->keystorePath)) {
-            throw new \Exception("File {$this->keystorePath} does not exist");
+        if (!$realPath = realpath($path)) {
+            throw new \Exception("File $path does not exist");
         }
 
-        if (!$pkcs12 = @file_get_contents($path)) {
-            throw new \Exception("Cert file {$path} cannot be read");
+        if (!$content = @file_get_contents($realPath)) {
+            throw new \Exception("File $realPath cannot be read");
         }
 
-        $keystore = [];
-        if (!@openssl_pkcs12_read($pkcs12, $keystore, $this->keystorePassword)) {
-            throw new \Exception('PKCS12 cannot be decoded');
-        }
-
-        return $keystore['pkey'];
+        return $content;
     }
 }

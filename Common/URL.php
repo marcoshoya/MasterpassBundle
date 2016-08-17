@@ -34,7 +34,7 @@ class URL
 
     /**
      * Verifies if is production environment or not.
-     * 
+     *
      * @return bool
      */
     public function isProduction()
@@ -44,7 +44,7 @@ class URL
 
     /**
      * Gets callback url.
-     * 
+     *
      * @return string
      */
     public function getCallbackUrl()
@@ -79,47 +79,47 @@ class URL
     {
         return $this->buildUrl(self::ACCESSURL);
     }
-    
+
     /**
-     * Get merchant initialization url
-     * 
+     * Get merchant initialization url.
+     *
      * @return string
      */
     public function getMerchantInitUrl()
     {
         return $this->buildUrl(self::MERCHANTINITURL);
     }
-    
+
     /**
-     * Get transaction url
-     * 
+     * Get transaction url.
+     *
      * @return string
      */
     public function getPrecheckoutUrl()
     {
         return $this->buildUrl(self::PRECHECKOUTURL);
     }
-    
+
     /**
-     * Get transaction url
-     * 
+     * Get transaction url.
+     *
      * @return string
      */
     public function getTransactionUrl()
     {
         return $this->buildUrl(self::POSTBACKURL);
     }
-    
+
     /**
-     * Get lightbox url
-     * 
+     * Get lightbox url.
+     *
      * @return string
      */
     public function getLightboxUrl()
     {
         return $this->buildUrl(self::LIGHTBOXURL);
     }
-    
+
     /**
      * @return string
      */
