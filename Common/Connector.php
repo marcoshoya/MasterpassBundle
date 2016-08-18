@@ -62,13 +62,11 @@ class Connector
     public $signatureBaseString;
     public $authHeader;
     protected $consumerKey;
-    protected $keystorePath;
-    protected $keystorePassword;
     private $privateKey;
     private $version = '1.0';
     private $signatureMethod = 'RSA-SHA1';
     public $realm = 'eWallet'; // This value is static
-    
+
     public $errorMessage = null;
 
     /**
@@ -80,20 +78,37 @@ class Connector
         $this->urlService = $url;
         if ($this->urlService->isProduction()) {
             $this->consumerKey = $keys['production']['consumerkey'];
-            $this->keystorePath = $keys['production']['keystorepath'];
-            $this->keystorePassword = $keys['production']['keystorepassword'];
+            $this->privateKey = new LocalPrivateKey(
+                $keys['production']['keystorepath'],
+                $keys['production']['keystorepassword']
+            );
         } else {
             $this->consumerKey = $keys['sandbox']['consumerkey'];
-            $this->keystorePath = $keys['sandbox']['keystorepath'];
-            $this->keystorePassword = $keys['sandbox']['keystorepassword'];
+            $this->privateKey = new LocalPrivateKey(
+                $keys['sandbox']['keystorepath'],
+                $keys['sandbox']['keystorepassword']
+            );
         }
-
-        $this->privateKey = $this->getPrivateKey();
     }
-    
+
     /**
-     * Returns the consumer key according environment
-     * 
+     * This method allows the class client to override the
+     * private key passed in the constructor.
+     *
+     * @param PrivateKeyInterface $privateKey
+     *
+     * @return Connector
+     */
+    public function setPrivateKey(PrivateKeyInterface $privateKey)
+    {
+        $this->privateKey = $privateKey;
+
+        return $this;
+    }
+
+    /**
+     * Returns the consumer key according environment.
+     *
      * @return string
      */
     public function getConsumerKey()
@@ -115,31 +130,6 @@ class Connector
     public function getCallbackUrl()
     {
         return $this->urlService->getCallbackUrl();
-    }
-
-    /**
-     * Method to retrieve the private key from the p12 file.
-     *
-     * @return string The private key
-     *
-     * @throws \Exception When the private key cannot be retrieved
-     */
-    private function getPrivateKey()
-    {
-        if (!$path = realpath($this->keystorePath)) {
-            throw new \Exception("File {$this->keystorePath} does not exist");
-        }
-
-        if (!$pkcs12 = @file_get_contents($path)) {
-            throw new \Exception("Cert file {$path} cannot be read");
-        }
-
-        $keystore = array();
-        if (!openssl_pkcs12_read($pkcs12, $keystore, $this->keystorePassword)) {
-            throw new \Exception('PKCS12 cannot be decoded');
-        }
-
-        return trim($keystore['pkey']);
     }
 
     /**
@@ -174,26 +164,26 @@ class Connector
     {
         return $this->doRequest($params, $this->urlService->getRequestUrl(), self::POST, $body);
     }
-    
+
     /**
-     * doCheckoutData
-     * 
-     * @param array $params
+     * doCheckoutData.
+     *
+     * @param array  $params
      * @param string $url
-     * 
+     *
      * @return string
      */
     public function doCheckoutData($params, $url)
     {
         return $this->doRequest($params, $url, self::GET);
     }
-    
+
     /**
-     * doTransaction
-     * 
-     * @param array $params
+     * doTransaction.
+     *
+     * @param array  $params
      * @param string $body
-     * 
+     *
      * @return string
      */
     public function doTransaction($params, $body)
@@ -229,9 +219,9 @@ class Connector
     /**
      * SDK:
      * Method to generate the body hash.
-     * 
+     *
      * @param string $body
-     * 
+     *
      * @return string
      */
     public function generateBodyHash($body)
@@ -243,19 +233,19 @@ class Connector
 
     /**
      * Builds a Auth Header used in connection to Masterpass services.
-     * 
+     *
      * @param array  $params
      * @param string $realm
      * @param string $url
      * @param string $requestMethod
-     * 
+     *
      * @return string - Auth header
      */
     private function buildAuthHeaderString($params, $realm, $url, $requestMethod)
     {
         $params = array_merge($this->oAuthParametersFactory(), $params);
 
-        $signature = $this->generateAndSignSignature($params, $url, $requestMethod, $this->privateKey);
+        $signature = $this->generateAndSignSignature($params, $url, $requestMethod);
 
         $params[self::OAUTH_SIGNATURE] = $signature;
 
@@ -275,50 +265,46 @@ class Connector
 
     /**
      * Method to generate base string and generate the signature.
-     *  
+     *
      * @param array  $params
      * @param string $url
      * @param string $requestMethod
-     * @param string $privateKey
-     * 
+     *
      * @return string
      */
-    private function generateAndSignSignature($params, $url, $requestMethod, $privateKey)
+    private function generateAndSignSignature($params, $url, $requestMethod)
     {
         $baseString = $this->generateBaseString($params, $url, $requestMethod);
 
         $this->signatureBaseString = $baseString;
 
-        $signature = $this->sign($baseString, $privateKey);
+        $signature = $this->sign($baseString);
 
         return $signature;
     }
 
     /**
      * Method to sign string.
-     * 
+     *
      * @param string $string
-     * @param string $privateKey
-     * 
+     *
      * @return string
      */
-    private function sign($string, $privateKey)
+    private function sign($string)
     {
-        $privatekeyid = openssl_get_privatekey($privateKey);
-
         $signature = null;
-        openssl_sign($string, $signature, $privatekeyid, OPENSSL_ALGO_SHA1);
+        openssl_sign($string, $signature, $this->privateKey->getContents(), OPENSSL_ALGO_SHA1);
 
         return base64_encode($signature);
     }
 
     /**
      * Method to generate the signature base string.
-     * 
+     *
      * @param array  $params
      * @param string $url
      * @param string $requestMethod
-     * 
+     *
      * @return string
      */
     private function generateBaseString($params, $url, $requestMethod)
@@ -342,7 +328,7 @@ class Connector
 
     /**
      * Method to create all default parameters used in the base string and auth header.
-     * 
+     *
      * @return array
      *
      * @throws \Exception When the consumer key has not been provided to the service
@@ -366,15 +352,15 @@ class Connector
 
     /**
      * General method to handle all HTTP connections.
-     * 
+     *
      * @param array       $params
      * @param string      $realm
      * @param string      $url
      * @param string      $requestMethod
      * @param string|null $body
-     * 
+     *
      * @throws \Exception - If connection fails or receives a HTTP status code > 300
-     * 
+     *
      * @return mixed
      */
     private function connect($params, $realm, $url, $requestMethod, $body = null)
@@ -418,9 +404,9 @@ class Connector
 
     /**
      * Method to check for HTML content in the exception message and remove everything except the body.
-     * 
+     *
      * @param \Exception $e
-     * 
+     *
      * @return \Exception
      */
     private function checkForErrors(\Exception $e)
