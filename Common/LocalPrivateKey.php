@@ -49,7 +49,7 @@ class LocalPrivateKey implements PrivateKeyInterface
             throw new \Exception("File $path does not exist");
         }
 
-        if (!$content = @file_get_contents($realPath)) {
+        if (false === $content = @file_get_contents($realPath)) {
             throw new \Exception("File $realPath cannot be read");
         }
 
