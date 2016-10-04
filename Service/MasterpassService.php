@@ -3,6 +3,7 @@
 namespace Hoya\MasterpassBundle\Service;
 
 use Hoya\MasterpassBundle\Common\Connector;
+use Hoya\MasterpassBundle\Common\BrandInterface;
 use Hoya\MasterpassBundle\DTO\AccessTokenResponse;
 use Hoya\MasterpassBundle\DTO\RequestTokenResponse;
 use Hoya\MasterpassBundle\DTO\CallbackResponse;
@@ -49,19 +50,24 @@ class MasterpassService
      * @var Connector
      */
     protected $connector;
+    
+    /**
+     * @var Hoya\MasterpassBundle\Common\BrandInterface
+     */
+    protected $brand;
 
     /**
      * @var RequestTokenResponse|null
      */
-    protected $requestToken;
+    protected $requestToken = null;
 
     /**
      * @param Connector $connector
      */
-    public function __construct(Connector $connector)
+    public function __construct(Connector $connector, BrandInterface $brand = null)
     {
         $this->connector = $connector;
-        $this->requestToken = null;
+        $this->brand = $brand;
     }
 
     /**
@@ -72,6 +78,30 @@ class MasterpassService
     public function getConnector()
     {
         return $this->connector;
+    }
+    
+    /**
+     * Gets checkout id
+     * 
+     * @return string
+     */
+    public function getCheckoutId()
+    {
+        return $this->brand->getCheckoutId();
+    }
+    
+    /**
+     * Sets brand
+     * 
+     * @param BrandInterface $brand
+     * 
+     * @return \Hoya\MasterpassBundle\Service\MasterpassService
+     */
+    public function setBrand(BrandInterface $brand)
+    {
+        $this->brand = $brand;
+        
+        return $this;
     }
 
     /**
