@@ -3,10 +3,14 @@ services:
         class: Hoya\MasterpassBundle\Common\URL
         arguments: ['%hoya_masterpass.production_mode%', '%hoya_masterpass.callback%']
         
+    hoya_masterpass_brand:
+        class: Hoya\MasterpassBundle\Common\Brand
+        arguments: ['%hoya_masterpass.checkoutidentifier%']
+        
     hoya_masterpass_connector:
         class: Hoya\MasterpassBundle\Common\Connector
         arguments:    ['@hoya_masterpass_url', '%hoya_masterpass.keys%']
         
     hoya_masterpass_service:
         class: Hoya\MasterpassBundle\Service\MasterpassService
-        arguments: ['@hoya_masterpass_connector']
+        arguments: ['@hoya_masterpass_connector', '@hoya_masterpass_brand']

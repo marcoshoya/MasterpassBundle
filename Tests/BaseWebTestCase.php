@@ -15,7 +15,6 @@ use Symfony\Component\HttpKernel\Kernel;
 
 class BaseWebTestCase extends WebTestCase
 {
-
     public static $container;
 
     protected function getContainer(array $options = array())
@@ -34,7 +33,7 @@ class BaseWebTestCase extends WebTestCase
 
     protected function deleteTmpDir($testCase)
     {
-        if (!file_exists($dir = sys_get_temp_dir() . '/' . Kernel::VERSION . '/' . $testCase)) {
+        if (!file_exists($dir = sys_get_temp_dir().'/'.Kernel::VERSION.'/'.$testCase)) {
             return;
         }
         $fs = new Filesystem();
@@ -43,7 +42,7 @@ class BaseWebTestCase extends WebTestCase
 
     protected static function getKernelClass()
     {
-        require_once __DIR__ . '/Functional/app/AppKernel.php';
+        require_once __DIR__.'/Functional/app/AppKernel.php';
 
         return 'Hoya\MasterpassBundle\Tests\Functional\app\AppKernel';
     }
@@ -51,10 +50,29 @@ class BaseWebTestCase extends WebTestCase
     protected static function createKernel(array $options = array())
     {
         $class = self::getKernelClass();
-        
+
         return new $class(
             'default', isset($options['debug']) ? $options['debug'] : true
         );
     }
+    
+    /**
+     * Mock connector service.
+     * 
+     * @param string $return
+     *
+     * @return \PHPUnit_Framework_MockObject_MockObject|Connector
+     */
+    protected function getMockConnector($return, $method)
+    {
+        $mock = $this->getMockBuilder('Hoya\MasterpassBundle\Common\Connector')
+                ->disableOriginalConstructor()
+                ->getMock();
 
+        $mock->expects($this->any())
+                ->method($method)
+                ->will($this->returnValue($return));
+
+        return $mock;
+    }
 }

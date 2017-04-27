@@ -19,7 +19,6 @@ use Symfony\Component\HttpKernel\Kernel;
  */
 class AppKernel extends Kernel
 {
-
     public function registerBundles()
     {
         $bundles = array(
@@ -28,7 +27,7 @@ class AppKernel extends Kernel
             new \Hoya\MasterpassBundle\HoyaMasterpassBundle(),
             new \Hoya\MasterpassBundle\Tests\Functional\HoyaMasterpassTestBundle(),
         );
-        
+
         return $bundles;
     }
 
@@ -39,19 +38,19 @@ class AppKernel extends Kernel
 
     public function getCacheDir()
     {
-        return sys_get_temp_dir() . '/' . Kernel::VERSION . '/masterpass-bundle/cache/' . $this->environment;
+        return sys_get_temp_dir().'/'.Kernel::VERSION.'/masterpass-bundle/cache/'.$this->environment;
     }
 
     public function getLogDir()
     {
-        return sys_get_temp_dir() . '/' . Kernel::VERSION . '/masterpass-bundle/logs';
+        return sys_get_temp_dir().'/'.Kernel::VERSION.'/masterpass-bundle/logs';
     }
 
     public function registerContainerConfiguration(LoaderInterface $loader)
     {
-        $loader->load(__DIR__ . '/config/' . $this->environment . '.yml');
-        
-        /**
+        $loader->load(__DIR__.'/config/'.$this->environment.'.yml');
+
+        /*
         // If symfony/framework-bundle > 3.0
         if (!class_exists('Symfony\Bundle\FrameworkBundle\Command\RouterApacheDumperCommand')) {
             $loader->load(__DIR__ . '/config/twig_assets.yml');
@@ -68,5 +67,4 @@ class AppKernel extends Kernel
     {
         call_user_func_array(array($this, '__construct'), unserialize($str));
     }
-
 }

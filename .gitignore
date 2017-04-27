@@ -1,6 +1,7 @@
 #Others
 *.php~
 /nbproject/*
-composer.lock
-phpunit.xml
-vendor/*
+/build
+/composer.lock
+/phpunit.xml
+/vendor/*
