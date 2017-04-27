@@ -23,6 +23,7 @@ class Configuration implements ConfigurationInterface
             ->children()
                 ->booleanNode('production_mode')->defaultFalse()->end()
                 ->scalarNode('callback')->defaultNull()->end()
+                ->scalarNode('origin_url')->defaultNull()->end()
                 ->scalarNode('checkoutidentifier')->defaultNull()->end()
                 ->arrayNode('keys')
                     ->addDefaultsIfNotSet()

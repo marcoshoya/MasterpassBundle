@@ -388,7 +388,7 @@ class Connector
         }
 
         $result = curl_exec($curl);
-        //print_r($result);
+        
         // Check if any error occurred
         if (curl_errno($curl)) {
             throw new \Exception(sprintf(self::SSL_ERROR_MESSAGE, curl_errno($curl), PHP_EOL, curl_error($curl)), curl_errno($curl));

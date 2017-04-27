@@ -2,6 +2,11 @@
 
 namespace Hoya\MasterpassBundle\Common;
 
+/**
+ * URL Helper
+ *
+ * @author Marcos Lazarin <marcoshoya at gmail dot com>
+ */
 class URL
 {
     const REQUESTURL = 'api.mastercard.com/oauth/consumer/v1/request_token';
@@ -21,15 +26,22 @@ class URL
      * @var string
      */
     private $callback;
+    
+    /**
+     * @var string
+     */
+    private $originUrl;
 
     /**
      * @param bool   $productionMode
      * @param string $callback
+     * @param string $originUrl
      */
-    public function __construct($productionMode, $callback)
+    public function __construct($productionMode, $callback, $originUrl = null)
     {
         $this->productionMode = $productionMode;
         $this->callback = $callback;
+        $this->originUrl = $originUrl;
     }
 
     /**
@@ -125,8 +137,10 @@ class URL
      */
     public function getOriginUrl()
     {
-        // @TODO
-        return 'http://localhost';
+        if (null == $this->originUrl) 
+            return 'http://localhost';
+        
+        return $this->originUrl;
     }
 
     /**
