@@ -3,15 +3,17 @@
 namespace Hoya\MasterpassBundle\DTO;
 
 /**
- * Description of CallbackResponse
+ * CallbackResponse DTO
  *
- * @author Marcos
+ * @author Marcos Lazarin <marcoshoya at gmail dot com>
  */
 class CallbackResponse
 {
-    public $requestToken;
-    public $requestVerifier;
-    public $checkoutResourceUrl;
-    public $checkoutId;
-    public $mpstatus;
+    public $mpstatus = null;
+    
+    public $checkoutResourceUrl = null;
+    
+    public $oauthVerifier = null;
+    
+    public $oauthToken = null;
 }

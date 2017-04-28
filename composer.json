@@ -16,7 +16,7 @@
     "require": {
         "php": ">=5.4.0",
         "symfony/twig-bundle": "~2.3|~3.0",
-        "symfony/framework-bundle": "~2.3|~3.0",
+        "symfony/framework-bundle": "3.1.7",
         "paragonie/random_compat": "^2.0"
     },
     "require-dev": {
@@ -27,8 +27,8 @@
         "symfony/form": "~2.3|~3.0",
         "symfony/finder": "~2.3|~3.0",
         "symfony/serializer": "~2.7|~3.0",
-        "sensio/framework-extra-bundle": "~3.0",
-        "symfony/phpunit-bridge": "~2.7|~3.0"
+        "sensio/framework-extra-bundle": "3.0.16",
+        "symfony/phpunit-bridge": "3.1.7"
     },
     "target-dir": "Hoya/MasterpassBundle",
     "autoload": {

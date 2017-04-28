@@ -279,12 +279,11 @@ class MasterpassService
     public function handleCallback(\Symfony\Component\HttpFoundation\Request $request)
     {
         $callback = new CallbackResponse;
-        $callback->requestToken = $request->get(self::OAUTH_TOKEN);
-        $callback->requestVerifier = $request->get(self::OAUTH_VERIFIER);
-        $callback->checkoutResourceUrl = $request->get(self::CHECKOUT_RESOURCE_URL);
-        $callback->checkoutId = $request->get(self::CHECKOUTID);
         $callback->mpstatus = $request->get(self::MPSTATUS);
-
+        $callback->checkoutResourceUrl = $request->get(self::CHECKOUT_RESOURCE_URL);
+        $callback->oauthVerifier = $request->get(self::OAUTH_VERIFIER);
+        $callback->oauthToken = $request->get(self::OAUTH_TOKEN);
+        
         return $callback;
     }
 

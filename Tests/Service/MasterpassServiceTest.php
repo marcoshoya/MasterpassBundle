@@ -12,7 +12,7 @@ use Hoya\MasterpassBundle\DTO\Transaction;
 use Hoya\MasterpassBundle\Service\MasterpassService;
 
 /**
- * MasterpassServiceTest.
+ * MasterpassServiceTest
  *
  * @author Marcos Lazarin
  */
@@ -24,16 +24,13 @@ class MasterpassServiceTest extends BaseWebTestCase
     
     const TRANSACTION = 'doTransaction';
 
-    /**
-     * @return MasterpassService
-     */
     protected function getService()
     {
         return $this->getContainer()->get('hoya_masterpass_service');
     }
 
     /**
-     * Testing service instance.
+     * Testing service instance
      */
     public function testInstance()
     {
@@ -41,9 +38,9 @@ class MasterpassServiceTest extends BaseWebTestCase
     }
 
     /**
-     * Testing request token.
+     * Testing request token
      * 
-     * @return RequestTokenResponse
+     * @return \Hoya\MasterpassBundle\DTO\RequestTokenResponse
      */
     public function testRequestToken()
     {
@@ -58,7 +55,7 @@ class MasterpassServiceTest extends BaseWebTestCase
     }
 
     /**
-     * Testing shoppingcart.
+     * Testing shoppingcart
      * 
      * @depends testRequestToken
      */
@@ -84,9 +81,43 @@ class MasterpassServiceTest extends BaseWebTestCase
         return $cartXml;
     }
 
-    public function testHandleCallback()
+    /**
+     * Testing callback service
+     */
+    public function testCallback()
     {
-        //oauth_token=db5a9e2a443ccf89ed825e6c9c0ef874ebe48097&oauth_verifier=af7bd8e66095828f8cc8c57096583ca848d62793&checkoutId=449087232&checkout_resource_url=https%3A%2F%2Fsandbox.api.mastercard.com%2Fmasterpass%2Fv6%2Fcheckout%2F449087232&mpstatus=success
+        // mock request
+        $mock = $this->getMockBuilder('Symfony\Component\HttpFoundation\Request')
+                ->disableOriginalConstructor()
+                ->getMock();
+
+        // starting mocking request parameters
+        $mock
+                ->expects($this->at(0))
+                ->method('get')
+                ->with($this->equalTo('mpstatus'))
+                ->will($this->returnValue('success'));
+        $mock
+                ->expects($this->at(1))
+                ->method('get')
+                ->with($this->equalTo('checkout_resource_url'))
+                ->will($this->returnValue('https%3A%2F%2Fsandbox.api.mastercard.com%2Fmasterpass%2Fv6%2Fcheckout%2F435527236'));
+        $mock
+                ->expects($this->at(2))
+                ->method('get')
+                ->with($this->equalTo('oauth_verifier'))
+                ->will($this->returnValue('2bddea1e3d84cfaf5a97b6dc6aa71258b3b96956'));
+        $mock
+                ->expects($this->at(3))
+                ->method('get')
+                ->with($this->equalTo('oauth_token'))
+                ->will($this->returnValue('d84b9df1166070bc1abd484b783fd3b34a12f8cc'));
+
+        $callback = $this->getService()->handleCallback($mock);
+
+        $this->assertInstanceOf('\Hoya\MasterpassBundle\DTO\CallbackResponse', $callback);
+        $this->assertEquals('success', $callback->mpstatus);
+        $this->assertEquals('2bddea1e3d84cfaf5a97b6dc6aa71258b3b96956', $callback->oauthVerifier);
     }
 
     /**
@@ -105,7 +136,7 @@ class MasterpassServiceTest extends BaseWebTestCase
         $callback->requestToken = '259f063894e0a1ab8996f805bbbeeab535812d6f';
 
         $accessTokenResponse = $service->getAccessToken($callback);
-        
+
         $this->assertInstanceOf('\Hoya\MasterpassBundle\DTO\AccessTokenResponse', $accessTokenResponse);
         $this->assertEquals('c7d33d2c6b6b49dc17db786c73a73b3abcadc43a', $accessTokenResponse->accessToken, 'accessToken does not have a valid value');
     }
@@ -154,17 +185,17 @@ class MasterpassServiceTest extends BaseWebTestCase
 XML;
         $connector = $this->getMockConnector($return, self::CHECKOUTDATA);
         $service = new MasterpassService($connector);
-        
+
         $accessToken = new AccessTokenResponse;
         $accessToken->checkoutResourceUrl = 'https://sandbox.api.mastercard.com/masterpass/v6/checkout/446156154';
         $accessToken->accessToken = 'c7d33d2c6b6b49dc17db786c73a73b3abcadc43a';
-        
+
         $checkoutData = $service->getCheckoutData($accessToken);
 
         $this->assertRegExp('<Checkout>', $checkoutData, 'Response does not contain Checkout');
         $this->assertRegExp('<TransactionId>', $checkoutData, 'Response does not contain TransactionId');
     }
-    
+
     public function testTransaction()
     {
         $return = <<<XML
@@ -190,10 +221,10 @@ XML;
         $transaction->transactionStatus = 'Success';
         $transaction->setPurchaseDate($purchase);
         $transaction->approvalCode = 'sample';
-        
+
         $connector = $this->getMockConnector($return, self::TRANSACTION);
         $service = new MasterpassService($connector);
-        
+
         $response = $service->postTransaction($transaction);
         $this->assertRegExp('<TransactionId>', $response, 'Response does not contain TransactionId');
     }
