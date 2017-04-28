@@ -2,8 +2,14 @@
 
 namespace Hoya\MasterpassBundle\Common;
 
+use Symfony\Bridge\Monolog\Logger;
 use Hoya\MasterpassBundle\Helper\MasterpassHelper;
 
+/**
+ * Connector class
+ *
+ * @author Marcos Lazarin <marcoshoya at gmail dot com>
+ */
 class Connector
 {
     const AMP = '&';
@@ -49,11 +55,6 @@ class Connector
     const HTML_BODY_OPEN = '<body>';
     const HTML_BODY_CLOSE = '</body>';
 
-    // Error Messages
-    const EMPTY_REQUEST_TOKEN_ERROR_MESSAGE = 'Invalid Request Token';
-    const INVALID_AUTH_URL = 'Invalid Auth Url';
-    const POSTBACK_ERROR_MESSAGE = 'Postback Transaction Call was unsuccessful';
-
     //Connection Strings
     const CONTENT_TYPE_APPLICATION_XML = 'Content-Type: application/xml';
     const SSL_ERROR_MESSAGE = 'SSL Error Code: %s %sSSL Error Message: %s';
@@ -66,15 +67,20 @@ class Connector
     private $version = '1.0';
     private $signatureMethod = 'RSA-SHA1';
     public $realm = 'eWallet'; // This value is static
-
     public $errorMessage = null;
+    
+    /**
+     * @var Symfony\Bridge\Monolog\Logger
+     */
+    private $logger;
 
     /**
      * @param URL   $url
      * @param array $keys
      */
-    public function __construct(URL $url, array $keys)
+    public function __construct(Logger $logger, URL $url, array $keys)
     {
+        $this->logger = $logger;
         $this->urlService = $url;
         if ($this->urlService->isProduction()) {
             $this->consumerKey = $keys['production']['consumerkey'];
@@ -130,6 +136,16 @@ class Connector
     public function getCallbackUrl()
     {
         return $this->urlService->getCallbackUrl();
+    }
+    
+    /**
+     * Get logger
+     * 
+     * @return Symfony\Bridge\Monolog\Logger
+     */
+    public function getLogger()
+    {
+        return $this->logger;
     }
 
     /**

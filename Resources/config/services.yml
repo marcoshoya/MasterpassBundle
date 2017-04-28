@@ -9,7 +9,7 @@ services:
         
     hoya_masterpass_connector:
         class: Hoya\MasterpassBundle\Common\Connector
-        arguments:    ['@hoya_masterpass_url', '%hoya_masterpass.keys%']
+        arguments:    ['@logger', '@hoya_masterpass_url', '%hoya_masterpass.keys%']
         
     hoya_masterpass_service:
         class: Hoya\MasterpassBundle\Service\MasterpassService
