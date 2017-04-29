@@ -5,3 +5,7 @@
 /composer.lock
 /phpunit.xml
 /vendor/*
+/Tests/Functional/app/cache/*
+!/Tests/Functional/app/cache/.gitkeep
+/Tests/Functional/app/logs/*
+!/Tests/Functional/app/logs/.gitkeep

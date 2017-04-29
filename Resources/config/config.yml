@@ -8,3 +8,13 @@ hoya_masterpass:
             consumerkey: cLb0tKkEJhGTITp_6ltDIibO5Wgbx4rIldeXM_jRd4b0476c!414f4859446c4a366c726a327474695545332b353049303d
             keystorepath: "%kernel.root_dir%/Certs/SandboxMCOpenAPI.p12"
             keystorepassword: changeit
+            
+monolog:
+    handlers:
+        main:
+            type:  rotating_file
+            path:  '%kernel.logs_dir%/%kernel.environment%.log'
+            level: debug
+            # max number of log files to keep
+            # defaults to zero, which means infinite files
+            max_files: 10

@@ -403,6 +403,9 @@ class Connector
             curl_setopt($curl, CURLOPT_POSTFIELDS, $body);
         }
 
+        $this->getLogger()->debug("[Hoya\MasterpassBundle\Common\Connector] calling {$url}");
+        $this->getLogger()->debug("[Hoya\MasterpassBundle\Common\Connector] body content: {$body}");
+        
         $result = curl_exec($curl);
         
         // Check if any error occurred

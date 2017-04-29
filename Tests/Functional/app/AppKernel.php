@@ -39,12 +39,12 @@ class AppKernel extends Kernel
 
     public function getCacheDir()
     {
-        return sys_get_temp_dir().'/'.Kernel::VERSION.'/masterpass-bundle/cache/'.$this->environment;
+        return __DIR__.'/cache/'.$this->environment;
     }
 
     public function getLogDir()
     {
-        return sys_get_temp_dir().'/'.Kernel::VERSION.'/masterpass-bundle/logs';
+        return __DIR__.'/logs/';
     }
 
     public function registerContainerConfiguration(LoaderInterface $loader)

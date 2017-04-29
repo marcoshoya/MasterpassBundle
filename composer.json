@@ -33,7 +33,7 @@
     },
     "target-dir": "Hoya/MasterpassBundle",
     "autoload": {
-        "psr-0": {
+        "psr-4": {
             "Hoya\\MasterpassBundle": ""
         }
     }
