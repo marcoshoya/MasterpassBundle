@@ -20,6 +20,7 @@ twig:
 hoya_masterpass:
     production_mode: false
     callback: http://localhost
+    origin_url: http://test.localhost.com
     checkoutidentifier: a4a6x1ywxlkxzhensyvad1hepuouaesuv
     keys:
         sandbox:

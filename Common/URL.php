@@ -137,8 +137,9 @@ class URL
      */
     public function getOriginUrl()
     {
-        if (null == $this->originUrl) 
+        if (null == $this->originUrl) {
             return 'http://localhost';
+        }
         
         return $this->originUrl;
     }
