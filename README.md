@@ -32,11 +32,16 @@ Setup your config.yml file
 hoya_masterpass:
     production_mode: false
     callback: http://localhost/app_dev.php
+    origin_url: http://test.localhost.com
     checkoutidentifier: a4a6x1ywxlkxzhensyvad1hepuouaesuv
     keys:
         sandbox:
             consumerkey: cLb0tKkEJhGTITp_6ltDIibO5Wgbx4rIldeXM_jRd4b0476c!414f4859446c4a366c726a327474695545332b353049303d
             keystorepath: "%kernel.root_dir%/Certs/SandboxMCOpenAPI.p12"
+            keystorepassword: changeit
+        production:
+            consumerkey: cLb0tKkEJhGTITp_6ltDIibO5Wgbx4rIldeXM_jRd4b0476c!414f4859446c4a366c726a327474695545332b353049303d
+            keystorepath: "%kernel.root_dir%/Certs/MCOpenAPI.p12"
             keystorepassword: changeit
 
 ```

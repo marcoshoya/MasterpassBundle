@@ -146,7 +146,6 @@ class MasterpassService
     {
         $xml = simplexml_load_string($shoppingCartXml);
         $xml->OAuthToken = $requestToken->requestToken;
-        $xml->OriginUrl = $this->connector->getOriginUrl();
 
         $newShoppingCartXml = $xml->asXML();
 
@@ -155,6 +154,29 @@ class MasterpassService
         );
 
         return $this->connector->doShoppingCart($params, $newShoppingCartXml);
+    }
+    
+    /**
+     * Posting Merchant init data do Masterpass services
+     * 
+     * @param RequestTokenResponse  $requestToken
+     * @param string                $initXml
+     * 
+     * @return string The XML response from MasterCard servicese
+     */
+    public function postMerchantInitData(RequestTokenResponse $requestToken, $initXml) 
+    {
+        $xml = simplexml_load_string($initXml);
+        $xml->OAuthToken = $requestToken->requestToken;
+        $xml->OriginUrl = $this->connector->getOriginUrl();
+
+        $newInitXml = $xml->asXML();
+
+        $params = array(
+            Connector::OAUTH_BODY_HASH => $this->connector->generateBodyHash($newInitXml),
+        );
+
+        return $this->connector->doMerchantInit($params, $newInitXml);
     }
 
     /**

@@ -7,6 +7,7 @@ use Symfony\Bundle\FrameworkBundle\Controller\Controller;
 use Symfony\Component\HttpFoundation\Request;
 use Hoya\MasterpassBundle\DTO\Shoppingcart;
 use Hoya\MasterpassBundle\DTO\ShoppingcartItem;
+use Hoya\MasterpassBundle\DTO\MerchantInit;
 use Hoya\MasterpassBundle\DTO\Transaction;
 use Hoya\MasterpassBundle\Helper\MasterpassHelper;
 
@@ -15,16 +16,17 @@ use Hoya\MasterpassBundle\Helper\MasterpassHelper;
  */
 class MasterpassController extends Controller
 {
+
     /**
      * @Route("/", name="homepage")
      */
     public function indexAction(Request $request)
     {
         $service = $this->get('hoya_masterpass_service');
-        
+
         return $this->render('default/index.html.twig', array(
-            'consumerKey' => $service->getConnector()->getConsumerKey(),
-            'checkoutIdentifier' => $service->getCheckoutId()
+                    'consumerKey' => $service->getConnector()->getConsumerKey(),
+                    'checkoutIdentifier' => $service->getCheckoutId()
         ));
     }
 
@@ -111,6 +113,31 @@ class MasterpassController extends Controller
     }
 
     /**
+     * @Route("/merchantInit", name="merchant_init")
+     */
+    public function merchantInitAction()
+    {
+        $service = $this->get('hoya_masterpass_service');
+        $requestToken = $this->get('session')->get('requestToken');
+
+        $render = [
+            'authHeader' => null
+        ];
+        
+        $init = new MerchantInit();
+        $initXml = $init->toXML();
+
+        $response = $service->postMerchantInitData($requestToken, $initXml);
+        if ($service->hasError()) {
+            $render['errorMessage'] = $service->getErrorMessage();
+        }
+
+        $render['initResponse'] = MasterpassHelper::formatXML($response);
+
+        return $this->render('default/merchantInit.html.twig', $render);
+    }
+
+    /**
      * @Route("/callback", name="callback")
      */
     public function callbackAction(Request $request)
@@ -194,7 +221,7 @@ class MasterpassController extends Controller
 
         $url = $this->get('hoya_masterpass_url');
         $service = $this->get('hoya_masterpass_service');
-        
+
         $purchase = new \DateTime;
         $transaction = new Transaction;
         $transaction->transactionId = 449087232;
@@ -204,7 +231,7 @@ class MasterpassController extends Controller
         $transaction->transactionStatus = 'Success';
         $transaction->setPurchaseDate($purchase);
         $transaction->approvalCode = 'sample';
-        
+
         $transactionResponse = $service->postTransaction($transaction);
         if ($service->hasError()) {
             $errorMessage = $service->getErrorMessage();
@@ -219,4 +246,5 @@ class MasterpassController extends Controller
                     'postTransactionResponse' => MasterpassHelper::formatXML($transactionResponse),
         ));
     }
+
 }

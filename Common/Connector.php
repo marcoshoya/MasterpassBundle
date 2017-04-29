@@ -158,6 +158,19 @@ class Connector
     {
         return $this->doRequest($params, $this->urlService->getShoppingcartUrl(), self::POST, $body);
     }
+    
+    /**
+     * Call Merchant Init service
+     * 
+     * @param array       $params
+     * @param string|null $body
+     *
+     * @return string
+     */
+    public function doMerchantInit($params, $body)
+    {
+        return $this->doRequest($params, $this->urlService->getMerchantInitUrl(), self::POST, $body);
+    }
 
     /**
      * @param array       $params

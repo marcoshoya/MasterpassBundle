@@ -6,6 +6,7 @@ use Hoya\MasterpassBundle\Tests\BaseWebTestCase;
 use Hoya\MasterpassBundle\DTO\RequestTokenResponse;
 use Hoya\MasterpassBundle\DTO\Shoppingcart;
 use Hoya\MasterpassBundle\DTO\ShoppingcartItem;
+use Hoya\MasterpassBundle\DTO\MerchantInit;
 use Hoya\MasterpassBundle\DTO\CallbackResponse;
 use Hoya\MasterpassBundle\DTO\AccessTokenResponse;
 use Hoya\MasterpassBundle\DTO\Transaction;
@@ -24,6 +25,11 @@ class MasterpassServiceTest extends BaseWebTestCase
     
     const TRANSACTION = 'doTransaction';
 
+    /**
+     * Invokes the service itself
+     * 
+     * @return \Hoya\MasterpassBundle\Service\MasterpassService
+     */
     protected function getService()
     {
         return $this->getContainer()->get('hoya_masterpass_service');
@@ -79,6 +85,24 @@ class MasterpassServiceTest extends BaseWebTestCase
         $this->assertRegExp('<OAuthToken>', $cartXml, 'Response does not contain OAuthToken');
 
         return $cartXml;
+    }
+    
+    /**
+     * Testing shoppingcart
+     * 
+     * @depends testRequestToken
+     */
+    public function testMerchantInit(RequestTokenResponse $requestToken)
+    {
+        $init = new MerchantInit();
+        $initXml = $init->toXML();
+        
+        $responseXml = $this->getService()->postMerchantInitData($requestToken, $initXml);
+
+        $this->assertRegExp('<MerchantInitializationResponse>', $responseXml, 'Response does not contain MerchantInitializationResponse');
+        $this->assertRegExp('<OAuthToken>', $responseXml, 'Response does not contain OAuthToken');
+
+        return $initXml;
     }
 
     /**
