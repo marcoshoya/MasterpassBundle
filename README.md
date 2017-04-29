@@ -1,4 +1,4 @@
-HoyaMasterpassBundle
+MasterpassBundle
 ================
 This Symfony 2 bundle implements the backend calls for Masterpass V6 checkout - Standard flow. For complete Masterpass docs, refer https://developer.mastercard.com/product/masterpass
 
