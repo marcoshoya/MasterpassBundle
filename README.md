@@ -1,6 +1,6 @@
 HoyaMasterpassBundle
 ================
-This bundle allows you to use Masterpass V6 checkout in your Symfony 2 application
+This Symfony 2 bundle implements the backend calls for Masterpass V6 checkout - Standard flow. For complete Masterpass docs, refer https://developer.mastercard.com/product/masterpass
 
 Install
 -------
