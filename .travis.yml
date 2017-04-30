@@ -21,4 +21,4 @@ branches:
 
 install: composer update $COMPOSER_FLAGS --prefer-dist
 
-script: ./phpunit
+script: phpunit --coverage-text
