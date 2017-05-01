@@ -16,6 +16,7 @@ use Hoya\MasterpassBundle\Service\MasterpassService;
  * MasterpassServiceTest
  *
  * @author Marcos Lazarin
+ * @group legacy
  */
 class MasterpassServiceTest extends BaseWebTestCase
 {
