@@ -31,8 +31,6 @@
         "sensio/framework-extra-bundle": "3.0.16",
         "symfony/phpunit-bridge": "3.1.7"
     },
-    "minimum-stability": "dev",
-    "prefer-stable": true,
     "target-dir": "Hoya/MasterpassBundle",
     "autoload": {
         "psr-0": {
