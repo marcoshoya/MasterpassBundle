@@ -14,7 +14,7 @@ Add HoyaMasterpassBundle in your composer.json:
 ```js
 {
     "require": {
-        "hoya/masterpass-bundle": "dev-master"
+        "hoya/masterpass-bundle": "~2.0.0"
     }
 }
 ```
