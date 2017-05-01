@@ -2,6 +2,7 @@ MasterpassBundle
 ================
 This Symfony 2 bundle implements the backend calls for Masterpass V6 checkout - Standard flow. For complete Masterpass docs, refer https://developer.mastercard.com/product/masterpass
 
+[![Build Status](https://travis-ci.org/marcoshoya/MasterpassBundle.svg?branch=master)](https://travis-ci.org/marcoshoya/MasterpassBundle)
 [![Total Downloads](https://poser.pugx.org/hoya/masterpass-bundle/downloads)](https://packagist.org/packages/hoya/masterpass-bundle)
 [![Latest Stable Version](https://poser.pugx.org/hoya/masterpass-bundle/v/stable)](https://packagist.org/packages/hoya/masterpass-bundle)
 
@@ -13,7 +14,7 @@ Add HoyaMasterpassBundle in your composer.json:
 ```js
 {
     "require": {
-        "hoya/masterpass-bundle": "dev-master"
+        "hoya/masterpass-bundle": "~2.0.0"
     }
 }
 ```
