@@ -143,23 +143,22 @@ class MasterpassServiceTest extends BaseWebTestCase
         $this->assertInstanceOf('\Hoya\MasterpassBundle\DTO\CallbackResponse', $callback);
         $this->assertEquals('success', $callback->mpstatus);
         $this->assertEquals('2bddea1e3d84cfaf5a97b6dc6aa71258b3b96956', $callback->oauthVerifier);
+        
+        return $callback;
     }
 
     /**
      * Test access token return.
+     * 
+     * @depends testCallback
      */
-    public function testAccessToken()
+    public function testAccessToken(CallbackResponse $callback)
     {
         $return = 'oauth_token=c7d33d2c6b6b49dc17db786c73a73b3abcadc43a&oauth_token_secret=399e50ba507a0faa27300ecfb50d55390f51f539';
 
         $connector = $this->getMockConnector($return, self::ACCESSTOKEN);
 
         $service = new MasterpassService($connector);
-
-        $callback = new CallbackResponse;
-        $callback->requestVerifier = '8f55989fa03a6dbe173749d0c495872f4a38d84c';
-        $callback->requestToken = '259f063894e0a1ab8996f805bbbeeab535812d6f';
-
         $accessTokenResponse = $service->getAccessToken($callback);
 
         $this->assertInstanceOf('\Hoya\MasterpassBundle\DTO\AccessTokenResponse', $accessTokenResponse);

@@ -117,8 +117,8 @@ class MasterpassService
     public function getAccessToken(CallbackResponse $callback)
     {
         $params = array(
-            self::OAUTH_VERIFIER => $callback->requestVerifier,
-            self::OAUTH_TOKEN => $callback->requestToken,
+            self::OAUTH_VERIFIER => $callback->oauthVerifier,
+            self::OAUTH_TOKEN => $callback->oauthToken,
         );
 
         $accessToken = new AccessTokenResponse();
