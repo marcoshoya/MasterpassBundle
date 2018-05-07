@@ -107,5 +107,24 @@ class MasterpassService
 
         return $callback;
     }
-
+    
+    /**
+     * Call PaymentData API
+     * 
+     * @param CallbackResponse $callback
+     * @param string $cartId
+     * 
+     * @return json|string
+     * 
+     * @throws Exception
+     */
+    public function getPaymentData(CallbackResponse $callback, $cartId = null)
+    {
+        if (!$callback->oauthToken) {
+            throw new Exception("oauthToken cannot be null");
+        }
+        
+        return $this->connector->doPaymentData($callback->oauthToken, $cartId, $this->getCheckoutId());
+        
+    }
 }

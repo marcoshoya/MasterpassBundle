@@ -3,13 +3,7 @@
 namespace Hoya\MasterpassBundle\Tests\Service;
 
 use Hoya\MasterpassBundle\Tests\BaseWebTestCase;
-use Hoya\MasterpassBundle\DTO\RequestTokenResponse;
-use Hoya\MasterpassBundle\DTO\Shoppingcart;
-use Hoya\MasterpassBundle\DTO\ShoppingcartItem;
-use Hoya\MasterpassBundle\DTO\MerchantInit;
 use Hoya\MasterpassBundle\DTO\CallbackResponse;
-use Hoya\MasterpassBundle\DTO\AccessTokenResponse;
-use Hoya\MasterpassBundle\DTO\Transaction;
 use Hoya\MasterpassBundle\Service\MasterpassService;
 
 /**
@@ -77,6 +71,28 @@ class MasterpassServiceTest extends BaseWebTestCase
         $this->assertEquals('2bddea1e3d84cfaf5a97b6dc6aa71258b3b96956', $callback->oauthVerifier);
         
         return $callback;
+    }
+    
+    /**
+     * Test payment data.
+     * 
+     * @depends testCallback
+     */
+    public function testPaymentData(CallbackResponse $callback)
+    {
+        $stub = '{"card":{"brandId":"master","brandName":"MasterCard","accountNumber":"5506900140100305","billingAddress":{"city":"O\'Fallon","country":"US","subdivision":"US-MO","line1":"2200 MasterCard Boulevard","postalCode":"63368"},"cardHolderName":"Hoya spt","expiryMonth":10,"expiryYear":2020},"shippingAddress":{"city":"O\'Fallon","country":"US","subdivision":"US-MO","line1":"2200 MasterCard Boulevard","postalCode":"63368"},"personalInfo":{"recipientName":"Hoya spt","recipientPhone":"1234987655","recipientEmailAddress":"joedoe@example.com"},"walletId":"101","authenticationOptions":{"authenticateMethod":"NO AUTHENTICATION"}}';
+        $cartid = '2d6896c0-2aa3-4e86-b41a-905a987b4734';
+        $checkoutid = 'a4a6x1ywxlkxzhensyvad1hepuouaesuv';
+        
+        // mocks
+        $connector = $this->getMockConnector($stub, 'doPaymentData');
+        $brand = new \Hoya\MasterpassBundle\Common\Brand($checkoutid);
+        
+        // creates services
+        $service = new MasterpassService($connector, $brand);
+        $response = $service->getPaymentData($callback, $cartid);
+        
+        $this->assertRegExp('/accountNumber/', $response, 'Response does not contain accountNumber');
     }
     
 }

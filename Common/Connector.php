@@ -132,70 +132,12 @@ class Connector {
      *
      * @return string
      */
-    public function doShoppingCart($params, $body)
+    public function doPaymentData($tid, $cartid, $checkoutid)
     {
-        return $this->doRequest($params, $this->urlService->getShoppingcartUrl(), self::POST, $body);
-    }
-
-    /**
-     * Call Merchant Init service
-     * 
-     * @param array       $params
-     * @param string|null $body
-     *
-     * @return string
-     */
-    public function doMerchantInit($params, $body)
-    {
-        return $this->doRequest($params, $this->urlService->getMerchantInitUrl(), self::POST, $body);
-    }
-
-    /**
-     * @param array       $params
-     * @param string|null $body
-     *
-     * @return string
-     */
-    public function doAccessToken($params)
-    {
-        return $this->doRequest($params, $this->urlService->getAccessUrl(), self::POST);
-    }
-
-    /**
-     * @param array       $params
-     * @param string|null $body
-     *
-     * @return string
-     */
-    public function doRequestToken($params, $body)
-    {
-        return $this->doRequest($params, $this->urlService->getRequestUrl(), self::POST, $body);
-    }
-
-    /**
-     * doCheckoutData.
-     *
-     * @param array  $params
-     * @param string $url
-     *
-     * @return string
-     */
-    public function doCheckoutData($params, $url)
-    {
+        $params = [];
+        $url = $this->urlService->getPaymentdataUrl($tid, $cartid, $checkoutid);
+                
         return $this->doRequest($params, $url, self::GET);
-    }
-
-    /**
-     * doTransaction.
-     *
-     * @param array  $params
-     * @param string $body
-     *
-     * @return string
-     */
-    public function doTransaction($params, $body)
-    {
-        return $this->doRequest($params, $this->urlService->getTransactionUrl(), self::POST, $body);
     }
 
     /**
