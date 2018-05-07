@@ -91,4 +91,14 @@ class URL
         
         return sprintf('%s/%s?checkoutId=%s&cartId=%s', $url, $tid, $checkoutid, $cartid);
     }
+    
+    /**
+     * Get postback url
+     * 
+     * @return string
+     */
+    public function getTransactionUrl()
+    {
+        return $this->buildUrl(self::POSTBACKURL);
+    }
 }

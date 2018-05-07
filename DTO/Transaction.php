@@ -15,12 +15,7 @@ class Transaction
     public $transactionId;
 
     /**
-     * @var string
-     */
-    public $consumerKey;
-
-    /**
-     * @var string
+     * @var string ISO-4217 code for currency of the transaction.
      */
     public $currency;
 
@@ -35,14 +30,19 @@ class Transaction
     private $purchaseDate;
 
     /**
-     * @var string
+     * @var boolean
      */
-    public $transactionStatus;
+    public $paymentSuccessful;
 
+    /**
+     * @var string The six-digit approval code returned by payment API.
+     */
+    public $paymentCode;
+    
     /**
      * @var string
      */
-    public $approvalCode;
+    public $preCheckoutTransactionId;
 
     /**
      * Set purchase
@@ -83,30 +83,22 @@ class Transaction
     {
         return $this->orderAmount;
     }
-
+    
     /**
-     * ToXml shoppingcart.
+     * toJSON object
      * 
-     * @return string
+     * @return string|json
      */
-    public function toXML()
+    public function toJSON()
     {
-        $domtree = new \DOMDocument('1.0', 'UTF-8');
-        $xmlrequest = $domtree->createElement('MerchantTransactions');
-
-        $transaction = $domtree->createElement('MerchantTransactions');
-        $transaction->appendChild($domtree->createElement('TransactionId', $this->transactionId));
-        $transaction->appendChild($domtree->createElement('ConsumerKey', $this->consumerKey));
-        $transaction->appendChild($domtree->createElement('Currency', $this->currency));
-        $transaction->appendChild($domtree->createElement('OrderAmount', $this->getAmount()));
-        $transaction->appendChild($domtree->createElement('PurchaseDate', $this->getPurchaseDate()->format(\DateTime::ATOM)));
-        $transaction->appendChild($domtree->createElement('TransactionStatus', $this->transactionStatus));
-        $transaction->appendChild($domtree->createElement('ApprovalCode', $this->approvalCode));
-
-        $xmlrequest->appendChild($transaction);
-        $domtree->appendChild($xmlrequest);
-
-        return $domtree->saveXML();
+        return json_encode([
+            'transactionId' => $this->transactionId,
+            'currency' => $this->currency,
+            'amount' => $this->getAmount(),
+            'paymentSuccessful' => $this->paymentSuccessful,
+            'paymentCode' => $this->paymentCode,
+            'paymentDate' => $this->getPurchaseDate()->format(\DateTime::ATOM) 
+        ]);
     }
 
 }

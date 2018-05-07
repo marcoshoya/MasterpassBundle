@@ -127,20 +127,6 @@ class Connector {
     }
 
     /**
-     * @param array       $params
-     * @param string|null $body
-     *
-     * @return string
-     */
-    public function doPaymentData($tid, $cartid, $checkoutid)
-    {
-        $params = [];
-        $url = $this->urlService->getPaymentdataUrl($tid, $cartid, $checkoutid);
-                
-        return $this->doRequest($params, $url, self::GET);
-    }
-
-    /**
      *  Method used for all Http connections.
      *
      * @param array       $params
@@ -370,6 +356,36 @@ class Connector {
         } else {
             return MasterpassHelper::formatXML($e->getMessage());
         }
+    }
+    
+    /**
+     * doPaymentData call
+     * 
+     * @param string        $tid
+     * @param string|null  $cartid
+     * @param string       $checkoutid
+     *
+     * @return string
+     */
+    public function doPaymentData($tid, $cartid, $checkoutid)
+    {
+        $params = [];
+        $url = $this->urlService->getPaymentdataUrl($tid, $cartid, $checkoutid);
+                
+        return $this->doRequest($params, $url, self::GET);
+    }
+    
+    /**
+     * doTransaction.
+     *
+     * @param array  $params
+     * @param string $body
+     *
+     * @return string
+     */
+    public function doTransaction($params, $body)
+    {
+        return $this->doRequest($params, $this->urlService->getTransactionUrl(), self::POST, $body);
     }
 
 }

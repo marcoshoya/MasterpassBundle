@@ -5,6 +5,7 @@ namespace Hoya\MasterpassBundle\Tests\Service;
 use Hoya\MasterpassBundle\Tests\BaseWebTestCase;
 use Hoya\MasterpassBundle\DTO\CallbackResponse;
 use Hoya\MasterpassBundle\Service\MasterpassService;
+use Hoya\MasterpassBundle\DTO\Transaction;
 
 /**
  * MasterpassServiceTest
@@ -93,6 +94,31 @@ class MasterpassServiceTest extends BaseWebTestCase
         $response = $service->getPaymentData($callback, $cartid);
         
         $this->assertRegExp('/accountNumber/', $response, 'Response does not contain accountNumber');
+    }
+    
+    /**
+     * Test postback api
+     */
+    public function testPostback()
+    {
+        $purchase = new \DateTime;
+         
+        $tr = new Transaction();
+
+        $tr->transactionId = 'feae1cae49b93bc0fbffcb462d6d3da8056ae6eb';
+        $tr->currency = 'USD';
+        $tr->setAmount('1.00');
+        $tr->paymentSuccessful = true;
+        $tr->paymentCode = 'sample';
+        $tr->setPurchaseDate($purchase);
+        
+        // mocks
+        $connector = $this->getMockConnector(null, 'doTransaction');
+        
+        $service = new MasterpassService($connector);
+        $response = $service->postTransaction($tr);
+        
+        $this->assertNull($response, 'Response is not null');
     }
     
 }
