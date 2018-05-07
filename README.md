@@ -1,6 +1,6 @@
 MasterpassBundle
 ================
-This Symfony 2 bundle implements the backend calls for Masterpass V6 checkout - Standard flow. For complete Masterpass docs, refer https://developer.mastercard.com/product/masterpass
+This Symfony 2 bundle implements the backend calls for Masterpass V7 checkout - Standard flow. For complete Masterpass docs, refer https://developer.mastercard.com/product/masterpass
 
 [![Build Status](https://travis-ci.org/marcoshoya/MasterpassBundle.svg?branch=master)](https://travis-ci.org/marcoshoya/MasterpassBundle)
 [![Total Downloads](https://poser.pugx.org/hoya/masterpass-bundle/downloads)](https://packagist.org/packages/hoya/masterpass-bundle)
@@ -14,7 +14,7 @@ Add HoyaMasterpassBundle in your composer.json:
 ```js
 {
     "require": {
-        "hoya/masterpass-bundle": "~2.0.0"
+        "hoya/masterpass-bundle": "~3.0.0"
     }
 }
 ```
@@ -37,17 +37,11 @@ Setup your config.yml file
 hoya_masterpass:
     production_mode: false
     callback: http://localhost/app_dev.php
-    origin_url: http://test.localhost.com
-    checkoutidentifier: a4a6x1ywxlkxzhensyvad1hepuouaesuv
+    checkoutidentifier: checkout_id
     keys:
-        sandbox:
-            consumerkey: cLb0tKkEJhGTITp_6ltDIibO5Wgbx4rIldeXM_jRd4b0476c!414f4859446c4a366c726a327474695545332b353049303d
-            keystorepath: "%kernel.root_dir%/Certs/SandboxMCOpenAPI.p12"
-            keystorepassword: changeit
-        production:
-            consumerkey: cLb0tKkEJhGTITp_6ltDIibO5Wgbx4rIldeXM_jRd4b0476c!414f4859446c4a366c726a327474695545332b353049303d
-            keystorepath: "%kernel.root_dir%/Certs/MCOpenAPI.p12"
-            keystorepassword: changeit
+        consumerkey: consumer_key_value
+        keystorepath: "%kernel.root_dir%/cert/csr_file.p12"
+        keystorepassword: changeit
 
 ```
 Usage
@@ -64,4 +58,4 @@ Install the [Composer](http://getcomposer.org/) `dev` dependencies:
 Then, run the test suite using
 [PHPUnit](https://github.com/sebastianbergmann/phpunit/):
 
-    phpunit
+    ./phpunit

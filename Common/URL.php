@@ -26,22 +26,16 @@ class URL
      * @var string
      */
     private $callback;
-    
-    /**
-     * @var string
-     */
-    private $originUrl;
 
     /**
      * @param bool   $productionMode
      * @param string $callback
      * @param string $originUrl
      */
-    public function __construct($productionMode, $callback, $originUrl = null)
+    public function __construct($productionMode, $callback)
     {
         $this->productionMode = $productionMode;
         $this->callback = $callback;
-        $this->originUrl = $originUrl;
     }
 
     /**
@@ -130,18 +124,6 @@ class URL
     public function getLightboxUrl()
     {
         return $this->buildUrl(self::LIGHTBOXURL);
-    }
-
-    /**
-     * @return string
-     */
-    public function getOriginUrl()
-    {
-        if (null == $this->originUrl) {
-            return 'http://localhost';
-        }
-        
-        return $this->originUrl;
     }
 
     /**

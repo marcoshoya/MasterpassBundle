@@ -1,7 +1,7 @@
 services:
     hoya_masterpass_url:
         class: Hoya\MasterpassBundle\Common\URL
-        arguments: ['%hoya_masterpass.production_mode%', '%hoya_masterpass.callback%', '%hoya_masterpass.origin_url%']
+        arguments: ['%hoya_masterpass.production_mode%', '%hoya_masterpass.callback%']
         
     hoya_masterpass_brand:
         class: Hoya\MasterpassBundle\Common\Brand

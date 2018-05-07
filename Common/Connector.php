@@ -10,8 +10,8 @@ use Hoya\MasterpassBundle\Helper\MasterpassHelper;
  *
  * @author Marcos Lazarin <marcoshoya at gmail dot com>
  */
-class Connector
-{
+class Connector {
+
     const AMP = '&';
     const QUESTION = '?';
     const EMPTY_STRING = '';
@@ -38,7 +38,6 @@ class Connector
     const OAUTH_BODY_HASH = 'oauth_body_hash';
     const BODY = 'body';
     const MESSAGE = 'Message';
-
     // Signature Base String
     const OAUTH_SIGNATURE = 'oauth_signature';
     const OAUTH_CONSUMER_KEY = 'oauth_consumer_key';
@@ -48,13 +47,11 @@ class Connector
     const OAUTH_CALLBACK = 'oauth_callback';
     const OAUTH_SIGNATURE_METHOD = 'oauth_signature_method';
     const OAUTH_VERSION = 'oauth_version';
-
     // Strings to detect errors in the service calls
     const ERRORS_TAG = '<Errors>';
     const HTML_TAG = '<html>';
     const HTML_BODY_OPEN = '<body>';
     const HTML_BODY_CLOSE = '</body>';
-
     //Connection Strings
     const CONTENT_TYPE_APPLICATION_XML = 'Content-Type: application/xml';
     const SSL_ERROR_MESSAGE = 'SSL Error Code: %s %sSSL Error Message: %s';
@@ -68,7 +65,7 @@ class Connector
     private $signatureMethod = 'RSA-SHA1';
     public $realm = 'eWallet'; // This value is static
     public $errorMessage = null;
-    
+
     /**
      * @var Symfony\Bridge\Monolog\Logger
      */
@@ -82,19 +79,8 @@ class Connector
     {
         $this->logger = $logger;
         $this->urlService = $url;
-        if ($this->urlService->isProduction()) {
-            $this->consumerKey = $keys['production']['consumerkey'];
-            $this->privateKey = new LocalPrivateKey(
-                $keys['production']['keystorepath'],
-                $keys['production']['keystorepassword']
-            );
-        } else {
-            $this->consumerKey = $keys['sandbox']['consumerkey'];
-            $this->privateKey = new LocalPrivateKey(
-                $keys['sandbox']['keystorepath'],
-                $keys['sandbox']['keystorepassword']
-            );
-        }
+        $this->consumerKey = $keys['consumerkey'];
+        $this->privateKey = new LocalPrivateKey($keys['keystorepath'], $keys['keystorepassword']);
     }
 
     /**
@@ -125,19 +111,11 @@ class Connector
     /**
      * @return string
      */
-    public function getOriginUrl()
-    {
-        return $this->urlService->getOriginUrl();
-    }
-
-    /**
-     * @return string
-     */
     public function getCallbackUrl()
     {
         return $this->urlService->getCallbackUrl();
     }
-    
+
     /**
      * Get logger
      * 
@@ -158,7 +136,7 @@ class Connector
     {
         return $this->doRequest($params, $this->urlService->getShoppingcartUrl(), self::POST, $body);
     }
-    
+
     /**
      * Call Merchant Init service
      * 
@@ -280,11 +258,11 @@ class Connector
 
         $startString = self::OAUTH_START_STRING;
         if (!empty($realm)) {
-            $startString = $startString.self::REALM.self::EQUALS.self::DOUBLE_QUOTE.$realm.self::DOUBLE_QUOTE.self::COMMA;
+            $startString = $startString . self::REALM . self::EQUALS . self::DOUBLE_QUOTE . $realm . self::DOUBLE_QUOTE . self::COMMA;
         }
 
         foreach ($params as $key => $value) {
-            $startString = $startString.$key.self::EQUALS.self::DOUBLE_QUOTE.MasterpassHelper::RFC3986urlencode($value).self::DOUBLE_QUOTE.self::COMMA;
+            $startString = $startString . $key . self::EQUALS . self::DOUBLE_QUOTE . MasterpassHelper::RFC3986urlencode($value) . self::DOUBLE_QUOTE . self::COMMA;
         }
 
         $this->authHeader = substr($startString, 0, strlen($startString) - 1);
@@ -343,16 +321,16 @@ class Connector
         $url = MasterpassHelper::formatUrl($url, $params);
         $params = MasterpassHelper::parseUrlParameters($urlMap, $params);
 
-        $baseString = strtoupper($requestMethod).self::AMP.MasterpassHelper::RFC3986urlencode($url).self::AMP;
+        $baseString = strtoupper($requestMethod) . self::AMP . MasterpassHelper::RFC3986urlencode($url) . self::AMP;
         ksort($params);
 
         $parameters = self::EMPTY_STRING;
         foreach ($params as $key => $value) {
-            $parameters = $parameters.$key.self::EQUALS.MasterpassHelper::RFC3986urlencode($value).self::AMP;
+            $parameters = $parameters . $key . self::EQUALS . MasterpassHelper::RFC3986urlencode($value) . self::AMP;
         }
         $parameters = MasterpassHelper::RFC3986urlencode(substr($parameters, 0, strlen($parameters) - 1));
 
-        return $baseString.$parameters;
+        return $baseString . $parameters;
     }
 
     /**
@@ -397,16 +375,16 @@ class Connector
         $curl = curl_init($url);
 
         // Adds the CA cert bundle to authenticate the SSL cert
-        curl_setopt($curl, CURLOPT_CAINFO, __DIR__.self::SSL_CA_CER_PATH_LOCATION);
+        curl_setopt($curl, CURLOPT_CAINFO, __DIR__ . self::SSL_CA_CER_PATH_LOCATION);
 
         curl_setopt($curl, CURLOPT_RETURNTRANSFER, true);
         curl_setopt($curl, CURLOPT_SSL_VERIFYHOST, 2);
         curl_setopt($curl, CURLOPT_SSL_VERIFYPEER, false); // This should always be TRUE to secure SSL connections
 
         curl_setopt($curl, CURLOPT_HTTPHEADER, array(
-            self::ACCEPT.self::COLON.self::SPACE.self::APPLICATION_XML,
-            self::CONTENT_TYPE.self::COLON.self::SPACE.self::APPLICATION_XML,
-            self::AUTHORIZATION.self::COLON.self::SPACE.$this->buildAuthHeaderString($params, $realm, $url, $requestMethod),
+            self::ACCEPT . self::COLON . self::SPACE . self::APPLICATION_XML,
+            self::CONTENT_TYPE . self::COLON . self::SPACE . self::APPLICATION_XML,
+            self::AUTHORIZATION . self::COLON . self::SPACE . $this->buildAuthHeaderString($params, $realm, $url, $requestMethod),
         ));
 
         if ($requestMethod == self::GET) {
@@ -418,9 +396,9 @@ class Connector
 
         $this->getLogger()->debug("[Hoya\MasterpassBundle\Common\Connector] calling {$url}");
         $this->getLogger()->debug("[Hoya\MasterpassBundle\Common\Connector] body content: {$body}");
-        
+
         $result = curl_exec($curl);
-        
+
         // Check if any error occurred
         if (curl_errno($curl)) {
             throw new \Exception(sprintf(self::SSL_ERROR_MESSAGE, curl_errno($curl), PHP_EOL, curl_error($curl)), curl_errno($curl));
@@ -451,4 +429,5 @@ class Connector
             return MasterpassHelper::formatXML($e->getMessage());
         }
     }
+
 }
