@@ -12,6 +12,7 @@ class URL
     const PAYMENTDATAURL = 'api.mastercard.com/masterpass/paymentdata';
     const POSTBACKURL = 'api.mastercard.com/masterpass/postback';
     const LIGHTBOXURL = 'masterpass.com/integration/merchant.js';
+    const ENCRYPTEDURL = 'api.mastercard.com/masterpass/encrypted-paymentdata';
 
     /**
      * @var bool
@@ -101,4 +102,22 @@ class URL
     {
         return $this->buildUrl(self::POSTBACKURL);
     }
+    
+    /**
+     * Get encrypted data url
+     * 
+     * @param string $tid
+     * @param string $cartid
+     * @param string $checkoutid
+     * 
+     * @return string
+     */
+    public function getEncryptedUrl($tid, $cartid, $checkoutid)
+    {
+        $url = $this->buildUrl(self::ENCRYPTEDURL);
+        
+        return sprintf('%s/%s?checkoutId=%s&cartId=%s', $url, $tid, $checkoutid, $cartid);
+    }
+    
+    
 }

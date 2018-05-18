@@ -387,5 +387,22 @@ class Connector {
     {
         return $this->doRequest($params, $this->urlService->getTransactionUrl(), self::POST, $body);
     }
+    
+    /**
+     * doPaymentData call
+     * 
+     * @param string        $tid
+     * @param string|null  $cartid
+     * @param string       $checkoutid
+     *
+     * @return string
+     */
+    public function doEncryptedData($tid, $cartid, $checkoutid)
+    {
+        $params = [];
+        $url = $this->urlService->getEncryptedUrl($tid, $cartid, $checkoutid);
+                
+        return $this->doRequest($params, $url, self::GET);
+    }
 
 }

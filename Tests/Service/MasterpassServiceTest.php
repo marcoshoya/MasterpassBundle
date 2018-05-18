@@ -121,4 +121,28 @@ class MasterpassServiceTest extends BaseWebTestCase
         $this->assertNull($response, 'Response is not null');
     }
     
+    /**
+     * Test payment data.
+     * 
+     * @depends testCallback
+     */
+    public function testEncryptedData(CallbackResponse $callback)
+    {
+        $stub = '{"encryptedPaymentData":"eyJlbmMiOiJBMTI4Q0JDLUhTMjU2IiwiYWxnIjoiUlNBLU9BRVAifQ.fWOubNQaP_-W41kGBdvchxw9zIJDZmt06SlN2VaLhgpFD7YChEh5U3-INInebUyg5L60YUwJVL80saNZL3t8HyXgcH2Y2v4_2qus6vejFsEo5fWg3cgfLB5b8pMygVdzeN7J7iPBmULlHirex25a7Bh256qqWaRBmZImABEBRcGfVKOs7OQuUX4NP8dI7FZdDnCh7sIjA5y0svcz4K1DzOCIgDuU5J1muw6QTAyX946wGL1pRFOEENXI8vYmeAtCmV83HR7psCNkzN2Evup69yXrtRgzuUzKUucAjOn3QoLyMx4PB7cIJBztRMnYj2IXZhBU23wxQkuhJS2WPh_oKA.LEKYrRhmSDw_s5vfjggCQQ.NdK9eEF26HLua8HgHjnkGYRQr_kgu3emGHNfe128qqgZbIVQLUjqbsPStHVhgHKzlKSEQEgI40Trz1jtSER9MwK3l1Z3hkwRB7coaRm65DnjpDJaldfyBCc9tIPE8rhoMe_dWN0QMd9QKeB21TbbopeCDDADJtqK8J59OWQ43gJMV2jrJpCme9rUdlrxSBy7PC38gpF6jbqnfEfKdipC_ncowNm9YUyjNHtI_a5mhvEK2DhqMXnVOlefJQoRKorihY0TxV5HcocX41sLtRkgUCnniMfZkRiwgQA0SumO0Nm-DAdhJTpAMyT4acyTk7J283avGKoZNtqkJlJlshBjuecQY6ivAru85wsAxZ0D8iHsSGtqJeiRCkvjvxe9f5fL1kxRnVDqU4iBTN_uJCw4kuWSkdf0PeYBMnFO5KqxT9eCCp8CnGwSg2GZLiPeW3bToMglP5h0NzBJRhJzqyjpSPiIy09cvGKmlh-YB3Lp3BpadK4aanLE2yDt7pmeRJEIWF1Oj6l7LM-dlUq1YRxxQdmBtf7BG6RL_XJMju1JhH3n-4GP9bT1LvdUGVegtjDTCGY_LTTfNlaAMpwlIuTuz6o_208bf7_OuB4uFp82LHW6uWwyZZuWc1SP303nZFDAheSiNfW-ur4j1x0XQZsAGUuFxfrXScqT5gvArzZzOpg.tyj-qGmo-zE5r_agPvFPwg"}';
+        $cartid = '2d6896c0-2aa3-4e86-b41a-905a987b4734';
+        $checkoutid = 'a4a6x1ywxlkxzhensyvad1hepuouaesuv';
+        
+        // mocks
+        $connector = $this->getMockConnector($stub, 'doEncryptedData');
+        $brand = new \Hoya\MasterpassBundle\Common\Brand($checkoutid);
+        
+        // creates services
+        $service = new MasterpassService($connector, $brand);
+        $response = $service->getEncryptedData($callback, $cartid);
+        
+        $this->assertRegExp('/encryptedPaymentData/', $response, 'Response does not contain accountNumber');
+    }
+    
+    
+    
 }

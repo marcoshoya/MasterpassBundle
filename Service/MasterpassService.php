@@ -149,4 +149,24 @@ class MasterpassService
             
         return $this->connector->doTransaction($params, $body);
     }
+    
+    /**
+     * Call EncryptedData API
+     * 
+     * @param CallbackResponse $callback
+     * @param string $cartId
+     * 
+     * @return json|string
+     * 
+     * @throws Exception
+     */
+    public function getEncryptedData(CallbackResponse $callback, $cartId = null)
+    {
+        if (!$callback->oauthToken) {
+            throw new Exception("oauthToken cannot be null");
+        }
+        
+        return $this->connector->doEncryptedData($callback->oauthToken, $cartId, $this->getCheckoutId());
+        
+    }
 }
