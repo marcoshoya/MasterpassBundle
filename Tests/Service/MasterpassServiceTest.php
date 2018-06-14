@@ -153,8 +153,7 @@ class MasterpassServiceTest extends BaseWebTestCase
      */
     public function testDecryptResponse($response)
     {
-        $json = json_decode($response);
-        $payload = $this->getService()->decryptResponse($json->encryptedPaymentData);
+        $payload = $this->getService()->decryptResponse($response);
 
         $this->assertRegExp('/accountNumber/', $payload, 'Response does not contain accountNumber');
     }

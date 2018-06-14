@@ -172,12 +172,14 @@ class MasterpassService
     /**
      * Decrypts API response using JOSE library
      * 
-     * @param string $response
+     * @param string $response Encrypted payload response
      * 
      * @return json|null
      */
     public function decryptResponse($response)
     {
-        return $this->connector->decryptResponse($response);
+        $json = json_decode($response);
+        
+        return $this->connector->decryptResponse($json->encryptedPaymentData);
     }
 }
