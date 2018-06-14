@@ -167,6 +167,17 @@ class MasterpassService
         }
         
         return $this->connector->doEncryptedData($callback->oauthToken, $cartId, $this->getCheckoutId());
-        
+    }
+    
+    /**
+     * Decrypts API response using JOSE library
+     * 
+     * @param string $response
+     * 
+     * @return json|null
+     */
+    public function decryptResponse($response)
+    {
+        return $this->connector->decryptResponse($response);
     }
 }

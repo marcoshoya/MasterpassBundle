@@ -22,7 +22,7 @@ hoya_masterpass:
     callback: http://localhost
     checkoutidentifier: a4a6x1ywxlkxzhensyvad1hepuouaesuv
     keys:
-        consumerkey: cLb0tKkEJhGTITp_6ltDIibO5Wgbx4rIldeXM_jRd4b0476c!414f4859446c4a366c726a327474695545332b353049303d
+        consumerkey: VruC-m9FPubDED632FI6KO2vQJHcwkPELQyS-XLk8606dbdb!8b2081df0f25466092701755039983290000000000000000
         keystorepath: "%kernel.root_dir%/Certs/SandboxMCOpenAPI.p12"
         keystorepassword: changeit
             

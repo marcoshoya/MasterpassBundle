@@ -125,6 +125,30 @@ class Connector {
     {
         return $this->logger;
     }
+    
+    /**
+     * Decrypt API response
+     * 
+     * @param string $content
+     * @return json|null
+     */
+    public function decryptResponse($content)
+    {
+        $jweDecoded = \JOSE_JWT::decode ($content);
+        
+        try {
+            $jwe = $jweDecoded->decrypt($this->privateKey->getContents());
+            if ($jwe instanceof \JOSE_JWE) {
+                
+                return $jwe->plain_text;
+            }
+            
+            return null;
+            
+        } catch (\Exception $ex) {
+            throw new \Exception("{decryptResponse} {$ex->getMessage()}");
+        }
+    }
 
     /**
      *  Method used for all Http connections.
@@ -354,7 +378,8 @@ class Connector {
 
             return $body;
         } else {
-            return MasterpassHelper::formatXML($e->getMessage());
+            //return MasterpassHelper::formatXML($e->getMessage());
+            return $e->getMessage();
         }
     }
     

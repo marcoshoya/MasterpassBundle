@@ -128,7 +128,8 @@ class MasterpassServiceTest extends BaseWebTestCase
      */
     public function testEncryptedData(CallbackResponse $callback)
     {
-        $stub = '{"encryptedPaymentData":"eyJlbmMiOiJBMTI4Q0JDLUhTMjU2IiwiYWxnIjoiUlNBLU9BRVAifQ.fWOubNQaP_-W41kGBdvchxw9zIJDZmt06SlN2VaLhgpFD7YChEh5U3-INInebUyg5L60YUwJVL80saNZL3t8HyXgcH2Y2v4_2qus6vejFsEo5fWg3cgfLB5b8pMygVdzeN7J7iPBmULlHirex25a7Bh256qqWaRBmZImABEBRcGfVKOs7OQuUX4NP8dI7FZdDnCh7sIjA5y0svcz4K1DzOCIgDuU5J1muw6QTAyX946wGL1pRFOEENXI8vYmeAtCmV83HR7psCNkzN2Evup69yXrtRgzuUzKUucAjOn3QoLyMx4PB7cIJBztRMnYj2IXZhBU23wxQkuhJS2WPh_oKA.LEKYrRhmSDw_s5vfjggCQQ.NdK9eEF26HLua8HgHjnkGYRQr_kgu3emGHNfe128qqgZbIVQLUjqbsPStHVhgHKzlKSEQEgI40Trz1jtSER9MwK3l1Z3hkwRB7coaRm65DnjpDJaldfyBCc9tIPE8rhoMe_dWN0QMd9QKeB21TbbopeCDDADJtqK8J59OWQ43gJMV2jrJpCme9rUdlrxSBy7PC38gpF6jbqnfEfKdipC_ncowNm9YUyjNHtI_a5mhvEK2DhqMXnVOlefJQoRKorihY0TxV5HcocX41sLtRkgUCnniMfZkRiwgQA0SumO0Nm-DAdhJTpAMyT4acyTk7J283avGKoZNtqkJlJlshBjuecQY6ivAru85wsAxZ0D8iHsSGtqJeiRCkvjvxe9f5fL1kxRnVDqU4iBTN_uJCw4kuWSkdf0PeYBMnFO5KqxT9eCCp8CnGwSg2GZLiPeW3bToMglP5h0NzBJRhJzqyjpSPiIy09cvGKmlh-YB3Lp3BpadK4aanLE2yDt7pmeRJEIWF1Oj6l7LM-dlUq1YRxxQdmBtf7BG6RL_XJMju1JhH3n-4GP9bT1LvdUGVegtjDTCGY_LTTfNlaAMpwlIuTuz6o_208bf7_OuB4uFp82LHW6uWwyZZuWc1SP303nZFDAheSiNfW-ur4j1x0XQZsAGUuFxfrXScqT5gvArzZzOpg.tyj-qGmo-zE5r_agPvFPwg"}';
+        $stub = '{"encryptedPaymentData":"eyJlbmMiOiJBMTI4Q0JDLUhTMjU2IiwiYWxnIjoiUlNBLU9BRVAifQ.jcE058JMIJ42Cepa6ctKgbidlIKNzDdCt1S4Qq-mNfITVic0x1-9rJ9AWx_lCtS8-_EHv-gEfsHi8hBQFkkv5atjILQXyyJbrVzQCyMRZokVoAnI5lrgSafaa2vLXpB5-eZRuhAH_p_VvSMfyhOvSVg2YR7SdBzKRiQhKSWMAzMgj1d-XkNo4gEc49pGqiuQCDjbN7Hd0vOJxmfMRJMobvoN5e7wyBL1FI9q1Rqa2NhWWJZp0Nu9_nyj9jFCjCTfAZm8CGqrbZV2IuQlH3i1FNNXxayWowPOCBf6mzm8q3iUlvWlR--pHnwcVrfH2y2Qhf42lC2JQgqCOIF4pCs1cg.k46vG798e3-8T2CY6RvYsQ.HjgqZW6c08t8CgqihN5akLcWpjnXDZpWw_LP3n7JiugzrMSqYFDgjJFwCbgfvhM64SBhZnytEltXrn5p3E_iFQZg2hZUFqQ9Mftpu5hcpw35AzFOsuuROgqbuz0JVxRWp-H2b7_hFMfyJnmrUgZ4xW1901zxiukgH3rc5zegamBVnes5VUqE2N-MqYCFc9IEC7H55CsZyt0mi1URbDvBFeu-K9_J5XvB0lMeDxgzqUjFh2rsi9P_-AzW8dvlRPxKOqDQYivbcChdMdlZ24BJXShLEJb-qsH1z43z7SI_N2yJCnApVq-y6252kUV_-EZWxEPQ66059nFnfuxH5RdkcjHD68L51suo29guRaB2TEE7lom8JsmJEHch_12WKLr4jlf2wBL_RjnQQx1yLVRLMQtA7KVS5U4LgmTeoul8yLBIaIJpU1YuTcKBRkGxUxh2wBb5tYIkX09ogkgRx2imzAKp4IUjDL1YilJ6EfFB5O5j6hetzuFcaixqB1novC1qQJyz1d6VQczJzgaPCNCyT4pDotXOcxzD9e-0uUwVhXWQPecqJpla25q6I1yn7lBNOCvghntJyK-7V0-nLvwxwq3d3y8eUvQaqncL5AVAceRWUstQFSvkJKIBWC6qKzVfjTEODFz7rBqUBMG4WWoWSDgGk_coSA-SIp4KY-frpvtl73zMMqHepgokPb8CXHhyi6wkRKSyPeAqozSUzWqWcyr2g1liBOBhcrUBjOwSmlzng7_J-Mg4TuudlQ7Lx0MCwIzDiV7LLDu0wH9rxKksCVy6VmvznvVUnHbpByW1ZTfKZPKeK6j7bJP543H_7AG409JP_FBp6WnXzc1KM5cwFg.O7OoU_Z3eXcDgiyNXfulmw"}';
+        
         $cartid = '2d6896c0-2aa3-4e86-b41a-905a987b4734';
         $checkoutid = 'a4a6x1ywxlkxzhensyvad1hepuouaesuv';
         
@@ -141,8 +142,22 @@ class MasterpassServiceTest extends BaseWebTestCase
         $response = $service->getEncryptedData($callback, $cartid);
         
         $this->assertRegExp('/encryptedPaymentData/', $response, 'Response does not contain accountNumber');
+        
+        return $response;
     }
     
+    /**
+     * Test decryption with JOSE dependency
+     * 
+     * @depends testEncryptedData
+     */
+    public function testDecryptResponse($response)
+    {
+        $json = json_decode($response);
+        $payload = $this->getService()->decryptResponse($json->encryptedPaymentData);
+
+        $this->assertRegExp('/accountNumber/', $payload, 'Response does not contain accountNumber');
+    }
     
     
 }
