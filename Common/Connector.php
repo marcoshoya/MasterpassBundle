@@ -430,4 +430,19 @@ class Connector {
         return $this->doRequest($params, $url, self::GET);
     }
 
+    /**
+     * doPaymentData call
+     * 
+     * @param string        $tid    pairing token from callback
+     * @param string|null   $userId
+     *
+     * @return string
+     */
+    public function doPairingData($tid, $userId)
+    {
+        $params = [];
+        $url = $this->urlService->getPairingUrl($tid, $userId);
+                
+        return $this->doRequest($params, $url, self::GET);
+    }
 }

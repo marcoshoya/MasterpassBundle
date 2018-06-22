@@ -13,6 +13,7 @@ class URL
     const POSTBACKURL = 'api.mastercard.com/masterpass/postback';
     const LIGHTBOXURL = 'masterpass.com/integration/merchant.js';
     const ENCRYPTEDURL = 'api.mastercard.com/masterpass/encrypted-paymentdata';
+    const PAIRINGURL = 'api.mastercard.com/masterpass/pairingid';
 
     /**
      * @var bool
@@ -119,5 +120,19 @@ class URL
         return sprintf('%s/%s?checkoutId=%s&cartId=%s', $url, $tid, $checkoutid, $cartid);
     }
     
+    /**
+     * Get pairing url
+     * 
+     * @param string $tid
+     * @param string $userId
+     * 
+     * @return string
+     */
+    public function getPairingUrl($tid, $userId)
+    {
+        $url = $this->buildUrl(self::PAIRINGURL);
+        
+        return sprintf('%s?pairingTransactionId=%s&userId=%s', $url, $tid, $userId);
+    }
     
 }

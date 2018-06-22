@@ -52,27 +52,22 @@ class MasterpassServiceTest extends BaseWebTestCase
         $mock
                 ->expects($this->at(1))
                 ->method('get')
-                ->with($this->equalTo('checkout_resource_url'))
-                ->will($this->returnValue('https%3A%2F%2Fsandbox.api.mastercard.com%2Fmasterpass%2Fv6%2Fcheckout%2F435527236'));
-        $mock
-                ->expects($this->at(2))
-                ->method('get')
                 ->with($this->equalTo('oauth_verifier'))
                 ->will($this->returnValue('2bddea1e3d84cfaf5a97b6dc6aa71258b3b96956'));
         $mock
-                ->expects($this->at(3))
+                ->expects($this->at(2))
                 ->method('get')
                 ->with($this->equalTo('oauth_token'))
                 ->will($this->returnValue('d84b9df1166070bc1abd484b783fd3b34a12f8cc'));
         
         $mock
-                ->expects($this->at(4))
+                ->expects($this->at(3))
                 ->method('get')
                 ->with($this->equalTo('pairing_verifier'))
                 ->will($this->returnValue('b64e1c85f4a3eafb13f5748ce09b48c90489471c'));
         
         $mock
-                ->expects($this->at(5))
+                ->expects($this->at(4))
                 ->method('get')
                 ->with($this->equalTo('pairing_token'))
                 ->will($this->returnValue('b64e1c85f4a3eafb13f5748ce09b48c90489471c'));
@@ -170,5 +165,28 @@ class MasterpassServiceTest extends BaseWebTestCase
         $this->assertRegExp('/accountNumber/', $payload, 'Response does not contain accountNumber');
     }
     
+    /**
+     * Test payment data.
+     * 
+     * @depends testCallback
+     */
+    public function testPairing(CallbackResponse $callback)
+    {
+        $stub = '{"pairingId" : "03787bf8cd09e22c3185423a6998abd27069a881"}';
+        $userid = 'joe.test@example.com';
+        $checkoutid = 'a4a6x1ywxlkxzhensyvad1hepuouaesuv';
+        
+        // mocks
+        $connector = $this->getMockConnector($stub, 'doPairingData');
+        $brand = new \Hoya\MasterpassBundle\Common\Brand($checkoutid);
+        
+        // creates services
+        $service = new MasterpassService($connector, $brand);
+        $response = $service->getPairingData($callback, $userid);
+        
+        $this->assertRegExp('/pairingId/', $response, 'Response does not contain accountNumber');
+    }
     
+    
+   
 }

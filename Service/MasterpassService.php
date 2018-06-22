@@ -14,19 +14,15 @@ use Hoya\MasterpassBundle\DTO\Transaction;
  */
 class MasterpassService 
 {
-
     // Callback URL parameters
     const OAUTH_TOKEN = 'oauth_token';
     const OAUTH_VERIFIER = 'oauth_verifier';
-    const CHECKOUT_RESOURCE_URL = 'checkout_resource_url';
-    const REDIRECT_URL = 'redirect_url';
     const PAIRING_TOKEN = 'pairing_token';
     const PAIRING_VERIFIER = 'pairing_verifier';
-    const CHECKOUTID = 'checkoutId';
     const MPSTATUS = 'mpstatus';
 
     /**
-     * @var Connector
+     * @var Hoya\MasterpassBundle\Common\Connector
      */
     protected $connector;
 
@@ -36,6 +32,9 @@ class MasterpassService
     protected $brand;
 
     /**
+     * Masterpass Service class
+     * 
+     * @param BrandInterface $brand
      * @param Connector $connector
      */
     public function __construct(Connector $connector, BrandInterface $brand = null)
@@ -107,7 +106,6 @@ class MasterpassService
     {
         $callback = new CallbackResponse;
         $callback->mpstatus = $request->get(self::MPSTATUS);
-        $callback->checkoutResourceUrl = $request->get(self::CHECKOUT_RESOURCE_URL);
         $callback->oauthVerifier = $request->get(self::OAUTH_VERIFIER);
         $callback->oauthToken = $request->get(self::OAUTH_TOKEN);
         $callback->pairingVerifier = $request->get(self::PAIRING_VERIFIER);
@@ -129,7 +127,7 @@ class MasterpassService
     public function getPaymentData(CallbackResponse $callback, $cartId = null)
     {
         if (!$callback->oauthToken) {
-            throw new Exception("oauthToken cannot be null");
+            throw new \Exception("oauthToken cannot be null");
         }
         
         return $this->connector->doPaymentData($callback->oauthToken, $cartId, $this->getCheckoutId());
@@ -165,7 +163,7 @@ class MasterpassService
     public function getEncryptedData(CallbackResponse $callback, $cartId = null)
     {
         if (!$callback->oauthToken) {
-            throw new Exception("oauthToken cannot be null");
+            throw new \Exception("oauthToken cannot be null");
         }
         
         return $this->connector->doEncryptedData($callback->oauthToken, $cartId, $this->getCheckoutId());
@@ -184,4 +182,25 @@ class MasterpassService
         
         return $this->connector->decryptResponse($json->encryptedPaymentData);
     }
+    
+    /**
+     * Call Pairing API
+     * 
+     * @param CallbackResponse $callback
+     * @param string $userId
+     * 
+     * @return json|string
+     * 
+     * @throws Exception
+     */
+    public function getPairingData(CallbackResponse $callback, $userId = null)
+    {
+        if (!$callback->pairingVerifier) {
+            throw new \Exception("pairingVerifier cannot be null");
+        }
+        
+        return $this->connector->doPairingData($callback->pairingVerifier, $userId);
+        
+    }
+    
 }
