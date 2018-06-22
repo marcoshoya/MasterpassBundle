@@ -64,6 +64,18 @@ class MasterpassServiceTest extends BaseWebTestCase
                 ->method('get')
                 ->with($this->equalTo('oauth_token'))
                 ->will($this->returnValue('d84b9df1166070bc1abd484b783fd3b34a12f8cc'));
+        
+        $mock
+                ->expects($this->at(4))
+                ->method('get')
+                ->with($this->equalTo('pairing_verifier'))
+                ->will($this->returnValue('b64e1c85f4a3eafb13f5748ce09b48c90489471c'));
+        
+        $mock
+                ->expects($this->at(5))
+                ->method('get')
+                ->with($this->equalTo('pairing_token'))
+                ->will($this->returnValue('b64e1c85f4a3eafb13f5748ce09b48c90489471c'));
 
         $callback = $this->getService()->handleCallback($mock);
 

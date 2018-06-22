@@ -16,4 +16,8 @@ class CallbackResponse
     public $oauthVerifier = null;
     
     public $oauthToken = null;
+    
+    public $pairingVerifier = null;
+    
+    public $pairingToken = null;
 }

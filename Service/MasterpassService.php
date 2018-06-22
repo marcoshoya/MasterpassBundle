@@ -110,6 +110,8 @@ class MasterpassService
         $callback->checkoutResourceUrl = $request->get(self::CHECKOUT_RESOURCE_URL);
         $callback->oauthVerifier = $request->get(self::OAUTH_VERIFIER);
         $callback->oauthToken = $request->get(self::OAUTH_TOKEN);
+        $callback->pairingVerifier = $request->get(self::PAIRING_VERIFIER);
+        $callback->pairingToken = $request->get(self::PAIRING_TOKEN);
 
         return $callback;
     }
