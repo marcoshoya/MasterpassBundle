@@ -14,3 +14,4 @@ services:
     hoya_masterpass_service:
         class: Hoya\MasterpassBundle\Service\MasterpassService
         arguments: ['@hoya_masterpass_connector', '@hoya_masterpass_brand']
+        public: true
