@@ -185,6 +185,84 @@ class MasterpassServiceTest extends BaseWebTestCase
         $response = $service->getPairingData($callback, $userid);
         
         $this->assertRegExp('/pairingId/', $response, 'Response does not contain accountNumber');
+        
+        return $response;
+    }
+    
+    /**
+     * Test payment data.
+     * 
+     * @depends testPairing
+     */
+    public function testPrecheckoutData($pairingResponse)
+    {
+        $stub = <<<JSON
+{
+  "cards" : [ {
+    "brandName" : "MasterCard",
+    "cardHolderName" : "James Stone",
+    "cardId" : "6243e3bf-ea2a-4cbc-bec7-323684d5ee38",
+    "expiryYear" : 2021,
+    "expiryMonth" : 11,
+    "lastFour" : "0014"
+  }, {
+    "brandName" : "Visa",
+    "cardHolderName" : "James Stone",
+    "cardId" : "2f6074b8-7f1e-4ac0-a1d0-f4679cac7f79",
+    "expiryYear" : 2023,
+    "expiryMonth" : 12,
+    "lastFour" : "1111"
+  } ],
+  "shippingAddresses" : [ {
+    "recipientInfo" : {
+      "recipientName" : "James Stone",
+      "recipientPhone" : "9171234567"
+    },
+    "addressId" : "45910e9f-4887-48fc-9a79-0b39428e89e0",
+    "city" : "New York",
+    "country" : "US",
+    "subdivision" : "US-NY",
+    "line1" : "123 Main St",
+    "postalCode" : "10011"
+  }, {
+    "recipientInfo" : {
+      "recipientName" : "James Stone",
+      "recipientPhone" : "9171234567"
+    },
+    "addressId" : "122fcc06-4b1d-4520-b191-e9f8577b1a8a",
+    "city" : "Boston",
+    "country" : "US",
+    "subdivision" : "US-MA",
+    "line1" : "323 Grand Ave",
+    "postalCode" : "02125"
+  } ],
+  "contactInfo" : {
+    "firstName" : "James",
+    "lastName" : "Stone",
+    "country" : "US",
+    "emailAddress" : "james.stome@myemail.com",
+    "phoneNumber" : "9171234567"
+  },
+  "preCheckoutTransactionId" : "dcdb243d-fbae-47fe-b59b-705e94242d2f",
+  "consumerWalletId" : "30729ad10cf32ccde82e61938d79b195",
+  "walletName" : "masterpass",
+  "pairingId" : "be90edd54aaf343770e790679a23d66e8a615503"
+}
+JSON;
+        $checkoutid = 'a4a6x1ywxlkxzhensyvad1hepuouaesuv';
+        
+        $pairing = json_decode($pairingResponse);
+        
+        // mocks
+        $connector = $this->getMockConnector($stub, 'doPrecheckoutData');
+        $brand = new \Hoya\MasterpassBundle\Common\Brand($checkoutid);
+        
+        // creates services
+        $service = new MasterpassService($connector, $brand);
+        $response = $service->getPrecheckoutData($pairing->pairingId);
+        
+        $this->assertRegExp('/cards/', $response, 'Response does not contain cards');
+        $this->assertRegExp('/pairingId/', $response, 'Response does not contain cards');
     }
     
     

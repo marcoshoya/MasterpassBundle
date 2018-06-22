@@ -445,4 +445,12 @@ class Connector {
                 
         return $this->doRequest($params, $url, self::GET);
     }
+    
+    public function doPrecheckoutData($pairingId)
+    {
+        $params = [];
+        $url = $this->urlService->getPrecheckoutUrl($pairingId);
+                
+        return $this->doRequest($params, $url, self::GET);
+    }
 }

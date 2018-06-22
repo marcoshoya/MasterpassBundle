@@ -200,7 +200,23 @@ class MasterpassService
         }
         
         return $this->connector->doPairingData($callback->pairingVerifier, $userId);
-        
     }
     
+    /**
+     * Call Precheckout API
+     * 
+     * @param string $precheckoutId
+     * 
+     * @return json|string
+     * 
+     * @throws Exception
+     */
+    public function getPrecheckoutData($precheckoutId)
+    {
+        if (!$precheckoutId) {
+            throw new \Exception("precheckoutId cannot be null");
+        }
+        
+        return $this->connector->doPrecheckoutData($precheckoutId);
+    }
 }

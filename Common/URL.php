@@ -14,6 +14,8 @@ class URL
     const LIGHTBOXURL = 'masterpass.com/integration/merchant.js';
     const ENCRYPTEDURL = 'api.mastercard.com/masterpass/encrypted-paymentdata';
     const PAIRINGURL = 'api.mastercard.com/masterpass/pairingid';
+    const PRECHECKOUTURL = 'api.mastercard.com/masterpass/precheckoutdata';
+    const EXPRESSURL = 'api.mastercard.com/masterpass/expresscheckout';
 
     /**
      * @var bool
@@ -135,4 +137,27 @@ class URL
         return sprintf('%s?pairingTransactionId=%s&userId=%s', $url, $tid, $userId);
     }
     
+    /**
+     * Get precheckout url
+     * 
+     * @param string $tid
+     * 
+     * @return string
+     */
+    public function getPrecheckoutUrl($tid)
+    {
+        $url = $this->buildUrl(self::PRECHECKOUTURL);
+        
+        return sprintf('%s/%s', $url, $tid);
+    }
+    
+    /**
+     * Get express url
+     * 
+     * @return string
+     */
+    public function getExpressUrl()
+    {
+        return $this->buildUrl(self::EXPRESSURL);
+    }
 }
