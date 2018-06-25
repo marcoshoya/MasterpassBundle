@@ -6,6 +6,7 @@ use Hoya\MasterpassBundle\Common\Connector;
 use Hoya\MasterpassBundle\Common\BrandInterface;
 use Hoya\MasterpassBundle\DTO\CallbackResponse;
 use Hoya\MasterpassBundle\DTO\Transaction;
+use Hoya\MasterpassBundle\DTO\ExpressCheckout;
 
 /**
  * MasterpassService class
@@ -218,5 +219,13 @@ class MasterpassService
         }
         
         return $this->connector->doPrecheckoutData($precheckoutId);
+    }
+    
+    public function postExpressCheckout(ExpressCheckout $express)
+    {
+        $body = $express->toJSON();
+        $params = [Connector::OAUTH_BODY_HASH => $this->connector->generateBodyHash($body)];
+            
+        return $this->connector->doExpressCheckout($params, $body);
     }
 }

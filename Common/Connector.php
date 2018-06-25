@@ -355,11 +355,14 @@ class Connector {
         if (curl_errno($curl)) {
             throw new \Exception(sprintf(self::SSL_ERROR_MESSAGE, curl_errno($curl), PHP_EOL, curl_error($curl)), curl_errno($curl));
         }
-
+        
         // Check for errors and throw an exception
         if (($errorCode = curl_getinfo($curl, CURLINFO_HTTP_CODE)) > 300) {
             throw new \Exception($result, $errorCode);
         }
+        
+        $this->getLogger()->debug("[Hoya\MasterpassBundle\Common\Connector] HTTP Code {$errorCode}");
+        $this->getLogger()->debug("[Hoya\MasterpassBundle\Common\Connector] Response: {$result}");
 
         return $result;
     }
@@ -452,5 +455,18 @@ class Connector {
         $url = $this->urlService->getPrecheckoutUrl($pairingId);
                 
         return $this->doRequest($params, $url, self::GET);
+    }
+    
+    /**
+     * doExpressCheckout
+     *
+     * @param array  $params
+     * @param string $body
+     *
+     * @return string
+     */
+    public function doExpressCheckout($params, $body)
+    {
+        return $this->doRequest($params, $this->urlService->getExpressUrl(), self::POST, $body);
     }
 }

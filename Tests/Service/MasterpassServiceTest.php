@@ -3,9 +3,10 @@
 namespace Hoya\MasterpassBundle\Tests\Service;
 
 use Hoya\MasterpassBundle\Tests\BaseWebTestCase;
-use Hoya\MasterpassBundle\DTO\CallbackResponse;
 use Hoya\MasterpassBundle\Service\MasterpassService;
+use Hoya\MasterpassBundle\DTO\CallbackResponse;
 use Hoya\MasterpassBundle\DTO\Transaction;
+use Hoya\MasterpassBundle\DTO\ExpressCheckout;
 
 /**
  * MasterpassServiceTest
@@ -174,14 +175,12 @@ class MasterpassServiceTest extends BaseWebTestCase
     {
         $stub = '{"pairingId" : "03787bf8cd09e22c3185423a6998abd27069a881"}';
         $userid = 'joe.test@example.com';
-        $checkoutid = 'a4a6x1ywxlkxzhensyvad1hepuouaesuv';
         
         // mocks
         $connector = $this->getMockConnector($stub, 'doPairingData');
-        $brand = new \Hoya\MasterpassBundle\Common\Brand($checkoutid);
         
         // creates services
-        $service = new MasterpassService($connector, $brand);
+        $service = new MasterpassService($connector);
         $response = $service->getPairingData($callback, $userid);
         
         $this->assertRegExp('/pairingId/', $response, 'Response does not contain accountNumber');
@@ -249,22 +248,86 @@ class MasterpassServiceTest extends BaseWebTestCase
   "pairingId" : "be90edd54aaf343770e790679a23d66e8a615503"
 }
 JSON;
-        $checkoutid = 'a4a6x1ywxlkxzhensyvad1hepuouaesuv';
         
         $pairing = json_decode($pairingResponse);
         
         // mocks
         $connector = $this->getMockConnector($stub, 'doPrecheckoutData');
-        $brand = new \Hoya\MasterpassBundle\Common\Brand($checkoutid);
         
         // creates services
-        $service = new MasterpassService($connector, $brand);
+        $service = new MasterpassService($connector);
         $response = $service->getPrecheckoutData($pairing->pairingId);
         
         $this->assertRegExp('/cards/', $response, 'Response does not contain cards');
         $this->assertRegExp('/pairingId/', $response, 'Response does not contain cards');
+        
+        return $response;
     }
     
-    
+    /**
+     * Test payment data.
+     * 
+     * @depends testPrecheckoutData
+     */
+    public function testExpressCheckout($precheckoutData)
+    {
+        $data = json_decode($precheckoutData);
+        $stub = <<<JSON
+{
+  "card" : {
+    "brandId" : "master",
+    "brandName" : "MasterCard",
+    "accountNumber" : "************0014",
+    "cardHolderName" : "James Stone",
+    "expiryMonth" : 11,
+    "expiryYear" : 2021,
+    "billingAddress" : {
+      "city" : "New York",
+      "country" : "US",
+      "subdivision" : "US-NY",
+      "line1" : "123 Main St",
+      "postalCode" : "10011"
+    }
+  },
+  "shippingAddress" : {
+    "city" : "New York",
+    "country" : "US",
+    "subdivision" : "US-NY",
+    "line1" : "123 Main St",
+    "postalCode" : "10011"
+  },
+  "personalInfo" : {
+    "recipientName" : "James Stone",
+    "recipientPhone" : "9171234567",
+    "recipientEmailAddress" : "james.stone@myemail.com"
+  },
+  "walletId" : "101",
+  "authenticationOptions" : {
+    "authenticateMethod" : "NO AUTHENTICATION"
+  },
+  "pairingId" : "2a185727a8dd79a2ada8944cc19b0d38abcf2f57"
+}
+JSON;
+        
+        $expressCheckout = new ExpressCheckout();
+        $expressCheckout->checkoutId = "a4a6x1ywxlkxzhensyvad1hepuouaesuv";
+        $expressCheckout->pairingId = $data->pairingId;
+        $expressCheckout->preCheckoutTransactionId = $data->preCheckoutTransactionId;
+        $expressCheckout->setAmount("1.00");
+        $expressCheckout->currency = "USD";
+        $expressCheckout->cardId = "12345";
+        $expressCheckout->shippingAddressId = "67890";
+        $expressCheckout->digitalGoods = false;
+        
+        // mocks
+        $connector = $this->getMockConnector($stub, 'doExpressCheckout');
+        
+        // creates services
+        $service = new MasterpassService($connector);
+        $response = $service->postExpressCheckout($expressCheckout);
+        
+        $this->assertRegExp('/card/', $response, 'Response does not contain cards');
+        $this->assertRegExp('/pairingId/', $response, 'Response does not contain cards');
+    }
    
 }
