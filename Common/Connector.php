@@ -135,19 +135,12 @@ class Connector {
     public function decryptResponse($content)
     {
         $jweDecoded = \JOSE_JWT::decode ($content);
-        
-        try {
-            $jwe = $jweDecoded->decrypt($this->privateKey->getContents());
-            if ($jwe instanceof \JOSE_JWE) {
-                
-                return $jwe->plain_text;
-            }
-            
-            return null;
-            
-        } catch (\Exception $ex) {
-            throw new \Exception("{decryptResponse} {$ex->getMessage()}");
-        }
+        $jwe = $jweDecoded->decrypt($this->privateKey->getContents());
+        if ($jwe instanceof \JOSE_JWE) {
+
+            return $jwe->plain_text;
+
+        }            
     }
 
     /**
@@ -168,11 +161,7 @@ class Connector {
             $params[self::OAUTH_BODY_HASH] = $this->generateBodyHash($body);
         }
 
-        try {
-            return $this->connect($params, $this->realm, $url, $requestMethod, $body);
-        } catch (\Exception $e) {
-            $this->errorMessage = $this->checkForErrors($e);
-        }
+        return $this->connect($params, $this->realm, $url, $requestMethod, $body);
     }
 
     /**
