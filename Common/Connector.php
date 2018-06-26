@@ -33,7 +33,7 @@ class Connector {
     const PKEY = 'pkey';
     const STRNATCMP = 'strnatcmp';
     const SHA1 = 'SHA1';
-    const APPLICATION_XML = 'application/json; charset=utf-8;';
+    const APPLICATION_XML = 'application/json;';
     const AUTHORIZATION = 'Authorization';
     const OAUTH_BODY_HASH = 'oauth_body_hash';
     const BODY = 'body';
