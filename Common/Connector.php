@@ -358,10 +358,12 @@ class Connector {
         
         // Check for errors and throw an exception
         if (($errorCode = curl_getinfo($curl, CURLINFO_HTTP_CODE)) > 300) {
+            $this->getLogger()->info("[Hoya\MasterpassBundle\Common\Connector] HTTP Code {$errorCode}");
+            $this->getLogger()->error("[Hoya\MasterpassBundle\Common\Connector] Exception: {$result}");
+            
             throw new \Exception($result, $errorCode);
         }
         
-        $this->getLogger()->debug("[Hoya\MasterpassBundle\Common\Connector] HTTP Code {$errorCode}");
         $this->getLogger()->debug("[Hoya\MasterpassBundle\Common\Connector] Response: {$result}");
 
         return $result;
