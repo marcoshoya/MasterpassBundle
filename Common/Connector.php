@@ -21,7 +21,6 @@ class Connector {
     const COLON = ':';
     const SPACE = ' ';
     const UTF_8 = 'UTF-8';
-    const V1 = 'v1';
     const OAUTH_START_STRING = 'OAuth ';
     const REALM = 'realm';
     const ACCEPT = 'Accept';
@@ -37,7 +36,7 @@ class Connector {
     const AUTHORIZATION = 'Authorization';
     const OAUTH_BODY_HASH = 'oauth_body_hash';
     const BODY = 'body';
-    const MESSAGE = 'Message';
+    
     // Signature Base String
     const OAUTH_SIGNATURE = 'oauth_signature';
     const OAUTH_CONSUMER_KEY = 'oauth_consumer_key';
@@ -47,13 +46,8 @@ class Connector {
     const OAUTH_CALLBACK = 'oauth_callback';
     const OAUTH_SIGNATURE_METHOD = 'oauth_signature_method';
     const OAUTH_VERSION = 'oauth_version';
-    // Strings to detect errors in the service calls
-    const ERRORS_TAG = '<Errors>';
-    const HTML_TAG = '<html>';
-    const HTML_BODY_OPEN = '<body>';
-    const HTML_BODY_CLOSE = '</body>';
+
     //Connection Strings
-    const CONTENT_TYPE_APPLICATION_XML = 'Content-Type: application/xml';
     const SSL_ERROR_MESSAGE = 'SSL Error Code: %s %sSSL Error Message: %s';
 
     protected $urlService;
@@ -160,8 +154,13 @@ class Connector {
         if ($body !== null) {
             $params[self::OAUTH_BODY_HASH] = $this->generateBodyHash($body);
         }
-
-        return $this->connect($params, $this->realm, $url, $requestMethod, $body);
+        
+        try {
+            return $this->connect($params, $this->realm, $url, $requestMethod, $body);
+            
+        } catch (\Exception $e) {
+            $this->getLogger()->error("[Hoya\MasterpassBundle\Common\Connector] Error: {$e->getMessage()}");
+        }
     }
 
     /**
@@ -339,42 +338,23 @@ class Connector {
         $this->getLogger()->debug("[Hoya\MasterpassBundle\Common\Connector] body content: {$body}");
 
         $result = curl_exec($curl);
-
+        $httpCode = curl_getinfo($curl, CURLINFO_HTTP_CODE);
+        
+        $this->getLogger()->info("[Hoya\MasterpassBundle\Common\Connector] HTTP Code {$httpCode}");
+        
         // Check if any error occurred
         if (curl_errno($curl)) {
             throw new \Exception(sprintf(self::SSL_ERROR_MESSAGE, curl_errno($curl), PHP_EOL, curl_error($curl)), curl_errno($curl));
         }
-        
+
         // Check for errors and throw an exception
-        if (($errorCode = curl_getinfo($curl, CURLINFO_HTTP_CODE)) > 300) {
-            $this->getLogger()->info("[Hoya\MasterpassBundle\Common\Connector] HTTP Code {$errorCode}");
-            $this->getLogger()->error("[Hoya\MasterpassBundle\Common\Connector] Exception: {$result}");
-            
-            throw new \Exception($result, $errorCode);
+        if ($httpCode > 300) {
+            throw new \Exception($result, $httpCode);
         }
         
         $this->getLogger()->debug("[Hoya\MasterpassBundle\Common\Connector] Response: {$result}");
 
         return $result;
-    }
-
-    /**
-     * Method to check for HTML content in the exception message and remove everything except the body.
-     *
-     * @param \Exception $e
-     *
-     * @return \Exception
-     */
-    private function checkForErrors(\Exception $e)
-    {
-        if (strpos($e->getMessage(), self::HTML_TAG) !== false) {
-            $body = substr($e->getMessage(), strpos($e->getMessage(), self::HTML_BODY_OPEN) + 6, strpos($e->getMessage(), self::HTML_BODY_CLOSE));
-
-            return $body;
-        } else {
-            //return MasterpassHelper::formatXML($e->getMessage());
-            return $e->getMessage();
-        }
     }
     
     /**
