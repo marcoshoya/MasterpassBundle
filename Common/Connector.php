@@ -160,6 +160,7 @@ class Connector {
             
         } catch (\Exception $e) {
             $this->getLogger()->error("[Hoya\MasterpassBundle\Common\Connector] Error: {$e->getMessage()}");
+            throw new \Exception($e->getMessage());
         }
     }
 
