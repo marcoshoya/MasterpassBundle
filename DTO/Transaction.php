@@ -97,7 +97,8 @@ class Transaction
             'amount' => $this->getAmount(),
             'paymentSuccessful' => $this->paymentSuccessful,
             'paymentCode' => $this->paymentCode,
-            'paymentDate' => $this->getPurchaseDate()->format(\DateTime::ATOM) 
+            'paymentDate' => $this->getPurchaseDate()->format(\DateTime::ATOM),
+            'preCheckoutTransactionId' => $this->preCheckoutTransactionId
         ]);
     }
 
