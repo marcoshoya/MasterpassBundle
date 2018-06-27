@@ -349,8 +349,8 @@ class Connector {
         $result = curl_exec($curl);
         $httpCode = curl_getinfo($curl, CURLINFO_HTTP_CODE);
         
-        $this->getLogger()->info('Calling "{url}"', ['url' => $url, 'header' => $header]);
-        $this->getLogger()->info('HTTP Response code "{code}" on "{class}"', ['class' => get_class(), 'code' => $httpCode]);
+        $this->getLogger()->debug('Calling "{url}"', ['url' => $url, 'header' => $header]);
+        $this->getLogger()->info('HTTP Response code "{code}" from "{url}"', ['url' => $url, 'code' => $httpCode]);
         
         // Check if any error occurred
         if (curl_errno($curl)) {
