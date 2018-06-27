@@ -161,7 +161,7 @@ class Connector {
             return $this->connect($params, $this->realm, $url, $requestMethod, $body);
             
         } catch (\Exception $e) {
-            $this->getLogger()->error('Error on "{class}" while calling "{error}"', [
+            $this->getLogger()->error('Error on "{class}" while calling "{url}"', [
                 'class' => get_class(),
                 'url' => $url,
                 'error' => $e->getMessage()
