@@ -2,7 +2,7 @@
 
 namespace Hoya\MasterpassBundle\Common;
 
-use Symfony\Bridge\Monolog\Logger;
+use Psr\Log\LoggerInterface;
 use Hoya\MasterpassBundle\Helper\MasterpassHelper;
 
 /**
@@ -69,7 +69,7 @@ class Connector {
      * @param URL   $url
      * @param array $keys
      */
-    public function __construct(Logger $logger, URL $url, array $keys)
+    public function __construct(LoggerInterface $logger, URL $url, array $keys)
     {
         $this->logger = $logger;
         $this->urlService = $url;
@@ -159,7 +159,11 @@ class Connector {
             return $this->connect($params, $this->realm, $url, $requestMethod, $body);
             
         } catch (\Exception $e) {
-            $this->getLogger()->error("[Hoya\MasterpassBundle\Common\Connector] Error: {$e->getMessage()}");
+            $this->getLogger()->error('Error on "{class}" while calling "{error}"', [
+                'class' => '[Hoya\MasterpassBundle\Common\Connector]',
+                'url' => $url,
+                'error' => $e->getMessage()
+            ]);
             throw new \Exception($e->getMessage());
         }
     }

@@ -17,10 +17,10 @@
         "php": ">=7.0.0",
         "symfony/twig-bundle": "^3.0",
         "symfony/framework-bundle": "^3.0",
-        "symfony/monolog-bundle": "^3.0.2",
         "symfony/templating": "^2.7|^3.0",
         "paragonie/random_compat": "^2.0",
         "symfony/security-csrf": "^3.4",
+        "psr/log": "~1.0",
         "gree/jose":"2.2.1"
     },
     "require-dev": {

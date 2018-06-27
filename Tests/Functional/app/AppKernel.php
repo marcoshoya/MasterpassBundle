@@ -24,9 +24,8 @@ class AppKernel extends Kernel
         $bundles = array(
             new \Symfony\Bundle\FrameworkBundle\FrameworkBundle(),
             new \Symfony\Bundle\TwigBundle\TwigBundle(),
-            new \Symfony\Bundle\MonologBundle\MonologBundle(),
             new \Hoya\MasterpassBundle\HoyaMasterpassBundle(),
-            new \Hoya\MasterpassBundle\Tests\Functional\HoyaMasterpassTestBundle(),
+            new \Hoya\MasterpassBundle\Tests\Functional\HoyaMasterpassTestBundle()
         );
 
         return $bundles;

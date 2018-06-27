@@ -10,6 +10,8 @@ services:
     hoya_masterpass_connector:
         class: Hoya\MasterpassBundle\Common\Connector
         arguments:    ['@logger', '@hoya_masterpass_url', '%hoya_masterpass.keys%']
+        tags:
+            - { name: monolog.logger, channel: masterpass }
         
     hoya_masterpass_service:
         class: Hoya\MasterpassBundle\Service\MasterpassService

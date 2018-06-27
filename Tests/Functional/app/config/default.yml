@@ -25,11 +25,3 @@ hoya_masterpass:
         consumerkey: VruC-m9FPubDED632FI6KO2vQJHcwkPELQyS-XLk8606dbdb!8b2081df0f25466092701755039983290000000000000000
         keystorepath: "%kernel.root_dir%/Certs/SandboxMCOpenAPI.p12"
         keystorepassword: changeit
-            
-monolog:
-    handlers:
-        main:
-            type: stream
-            path: "%kernel.logs_dir%/%kernel.environment%.log"
-            level: debug
-            channels: [!event]
