@@ -156,11 +156,13 @@ class Connector {
         }
         
         try {
+            $this->getLogger()->info('Calling "{url}" on "{class}"', ['class' => get_class(), 'url' => $url]);
+            
             return $this->connect($params, $this->realm, $url, $requestMethod, $body);
             
         } catch (\Exception $e) {
             $this->getLogger()->error('Error on "{class}" while calling "{error}"', [
-                'class' => '[Hoya\MasterpassBundle\Common\Connector]',
+                'class' => get_class(),
                 'url' => $url,
                 'error' => $e->getMessage()
             ]);
@@ -338,11 +340,6 @@ class Connector {
             curl_setopt($curl, CURLOPT_CUSTOMREQUEST, strtoupper($requestMethod));
             curl_setopt($curl, CURLOPT_POSTFIELDS, $body);
         }
-        
-        $this->getLogger()->debug('Calling "{url}" on "{class}"', [
-            'class' => '[Hoya\MasterpassBundle\Common\Connector]',
-            'url' => $url
-        ]);
 
         if ($body !== null) {
             $this->getLogger()->debug("Sending body content", ['content' => $body]);
@@ -351,10 +348,7 @@ class Connector {
         $result = curl_exec($curl);
         $httpCode = curl_getinfo($curl, CURLINFO_HTTP_CODE);
         
-        $this->getLogger()->debug('HTTP Response code "{code}" on "{class}"', [
-            'class' => '[Hoya\MasterpassBundle\Common\Connector]',
-            'code' => $httpCode
-        ]);
+        $this->getLogger()->info('HTTP Response code "{code}" on "{class}"', ['class' => get_class(), 'code' => $httpCode]);
         
         // Check if any error occurred
         if (curl_errno($curl)) {
@@ -366,7 +360,7 @@ class Connector {
             throw new \Exception($result, $httpCode);
         }
         
-        $this->getLogger()->debug('Response from "{class}"', ['class' => '[Hoya\MasterpassBundle\Common\Connector]', 'response' => $result]);
+        $this->getLogger()->debug('Response from "{class}"', ['class' => get_class(), 'response' => $result]);
 
         return $result;
     }
