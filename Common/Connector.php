@@ -338,14 +338,23 @@ class Connector {
             curl_setopt($curl, CURLOPT_CUSTOMREQUEST, strtoupper($requestMethod));
             curl_setopt($curl, CURLOPT_POSTFIELDS, $body);
         }
+        
+        $this->getLogger()->debug('Calling "{url}" on "{class}"', [
+            'class' => '[Hoya\MasterpassBundle\Common\Connector]',
+            'url' => $url
+        ]);
 
-        $this->getLogger()->debug("[Hoya\MasterpassBundle\Common\Connector] calling {$url}");
-        $this->getLogger()->debug("[Hoya\MasterpassBundle\Common\Connector] body content: {$body}");
+        if ($body !== null) {
+            $this->getLogger()->debug("Sending body content", ['content' => $body]);
+        }
 
         $result = curl_exec($curl);
         $httpCode = curl_getinfo($curl, CURLINFO_HTTP_CODE);
         
-        $this->getLogger()->info("[Hoya\MasterpassBundle\Common\Connector] HTTP Code {$httpCode}");
+        $this->getLogger()->debug('HTTP Response code "{code}" on "{class}"', [
+            'class' => '[Hoya\MasterpassBundle\Common\Connector]',
+            'code' => $httpCode
+        ]);
         
         // Check if any error occurred
         if (curl_errno($curl)) {
@@ -357,7 +366,7 @@ class Connector {
             throw new \Exception($result, $httpCode);
         }
         
-        $this->getLogger()->debug("[Hoya\MasterpassBundle\Common\Connector] Response: {$result}");
+        $this->getLogger()->debug('Response from "{class}"', ['class' => '[Hoya\MasterpassBundle\Common\Connector]', 'response' => $result]);
 
         return $result;
     }
