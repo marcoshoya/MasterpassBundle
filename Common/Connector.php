@@ -156,7 +156,6 @@ class Connector {
         }
         
         try {
-            $this->getLogger()->info('Calling "{url}" on "{class}"', ['class' => get_class(), 'url' => $url]);
             
             return $this->connect($params, $this->realm, $url, $requestMethod, $body);
             
@@ -328,11 +327,13 @@ class Connector {
         curl_setopt($curl, CURLOPT_SSL_VERIFYHOST, 2);
         curl_setopt($curl, CURLOPT_SSL_VERIFYPEER, false); // This should always be TRUE to secure SSL connections
 
-        curl_setopt($curl, CURLOPT_HTTPHEADER, array(
+        $header = array(
             self::ACCEPT . self::COLON . self::SPACE . self::APPLICATION_XML,
             self::CONTENT_TYPE . self::COLON . self::SPACE . self::APPLICATION_XML,
             self::AUTHORIZATION . self::COLON . self::SPACE . $this->buildAuthHeaderString($params, $realm, $url, $requestMethod),
-        ));
+        );
+                
+        curl_setopt($curl, CURLOPT_HTTPHEADER, $header);
 
         if ($requestMethod == self::GET) {
             curl_setopt($curl, CURLOPT_HTTPGET, true);
@@ -348,6 +349,7 @@ class Connector {
         $result = curl_exec($curl);
         $httpCode = curl_getinfo($curl, CURLINFO_HTTP_CODE);
         
+        $this->getLogger()->info('Calling "{url}"', ['url' => $url, 'header' => $header]);
         $this->getLogger()->info('HTTP Response code "{code}" on "{class}"', ['class' => get_class(), 'code' => $httpCode]);
         
         // Check if any error occurred
