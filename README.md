@@ -1,6 +1,6 @@
 MasterpassBundle
 ================
-This Symfony 2 bundle implements the backend calls for Masterpass V7 checkout - Standard flow. For complete Masterpass docs, refer https://developer.mastercard.com/product/masterpass
+This Symfony 2 bundle implements the backend calls for Masterpass V7 checkout - Standard and Express flows. For complete Masterpass docs, refer https://developer.mastercard.com/product/masterpass
 
 [![Build Status](https://travis-ci.org/marcoshoya/MasterpassBundle.svg?branch=master)](https://travis-ci.org/marcoshoya/MasterpassBundle)
 [![Total Downloads](https://poser.pugx.org/hoya/masterpass-bundle/downloads)](https://packagist.org/packages/hoya/masterpass-bundle)
@@ -36,7 +36,6 @@ Setup your config.yml file
 
 hoya_masterpass:
     production_mode: false
-    callback: http://localhost/app_dev.php
     checkoutidentifier: checkout_id
     keys:
         consumerkey: consumer_key_value
@@ -46,7 +45,22 @@ hoya_masterpass:
 ```
 Usage
 -----
-You may follow some sample [code here](https://github.com/marcoshoya/MasterpassBundle/blob/master/Controller/MasterpassController.php)
+You may follow some sample [code here](https://github.com/marcoshoya/MasterpassBundle/blob/master/Controller/CheckoutController.php)
+
+Handling Errors
+---------------
+Any error which may happen while calling Masterpass APIs throws an Exception. Hence, it is highly recommended to use try / catch block
+In addition, you can check further details on symfony logs.
+
+```js
+try {
+                
+    $payment = $this->get('hoya_masterpass_service')->getPaymentData($callback, '1234');
+
+} catch (\Exception $e) {
+    $this->get('session')->getFlashBag()->add('error', $e->getMessage());
+}
+```
 
 Running the Tests
 -----------------
