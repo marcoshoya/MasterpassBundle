@@ -105,6 +105,27 @@ class MasterpassServiceTest extends BaseWebTestCase
     }
     
     /**
+     * Test payment data.
+     * 
+     * @depends testCallback
+     */
+    public function testPspPaymentData(CallbackResponse $callback)
+    {
+        $stub = '{"card":{"brandId":"master","brandName":"MasterCard","accountNumber":"5506900140100305","billingAddress":{"city":"O\'Fallon","country":"US","subdivision":"US-MO","line1":"2200 MasterCard Boulevard","postalCode":"63368"},"cardHolderName":"Hoya spt","expiryMonth":10,"expiryYear":2020},"shippingAddress":{"city":"O\'Fallon","country":"US","subdivision":"US-MO","line1":"2200 MasterCard Boulevard","postalCode":"63368"},"personalInfo":{"recipientName":"Hoya spt","recipientPhone":"1234987655","recipientEmailAddress":"joedoe@example.com"},"walletId":"101","authenticationOptions":{"authenticateMethod":"NO AUTHENTICATION"}}';
+        $checkoutid = 'a4a6x1ywxlkxzhensyvad1hepuouaesuv';
+        
+        // mocks
+        $connector = $this->getMockConnector($stub, 'doPspPaymentData');
+        $brand = new \Hoya\MasterpassBundle\Common\Brand($checkoutid);
+        
+        // creates services
+        $service = new MasterpassService($connector, $brand);
+        $response = $service->getPspPaymentData($callback->oauthToken);
+        
+        $this->assertRegExp('/accountNumber/', $response, 'Response does not contain accountNumber');
+    }
+    
+    /**
      * Test postback api
      */
     public function testPostback()

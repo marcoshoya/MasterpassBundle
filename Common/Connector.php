@@ -450,4 +450,19 @@ class Connector {
     {
         return $this->doRequest($params, $this->urlService->getExpressUrl(), self::POST, $body);
     }
+    
+    /**
+     * doPspPaymentData call
+     * 
+     * @param string        $tid
+     *
+     * @return string
+     */
+    public function doPspPaymentData($tid)
+    {
+        $params = [];
+        $url = $this->urlService->getPspPaymentdataUrl($tid);
+                
+        return $this->doRequest($params, $url, self::GET);
+    }
 }

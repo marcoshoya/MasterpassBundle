@@ -16,6 +16,7 @@ class URL
     const PAIRINGURL = 'api.mastercard.com/masterpass/pairingid';
     const PRECHECKOUTURL = 'api.mastercard.com/masterpass/precheckoutdata';
     const EXPRESSURL = 'api.mastercard.com/masterpass/expresscheckout';
+    const PSPDATAURL = 'api.mastercard.com/masterpass/psp-paymentdata';
 
     /**
      * @var bool
@@ -159,5 +160,19 @@ class URL
     public function getExpressUrl()
     {
         return $this->buildUrl(self::EXPRESSURL);
+    }
+    
+    /**
+     * Get psp payment data url
+     * 
+     * @param string $tid
+     * 
+     * @return string
+     */
+    public function getPspPaymentdataUrl($tid)
+    {
+        $url = $this->buildUrl(self::PSPDATAURL);
+        
+        return sprintf('%s/%s', $url, $tid);
     }
 }

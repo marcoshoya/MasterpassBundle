@@ -228,4 +228,17 @@ class MasterpassService
             
         return $this->connector->doExpressCheckout($params, $body);
     }
+    
+    /**
+     * Call PSP payment data API
+     * 
+     * @param string $tid
+     * 
+     * @return string|json
+     */
+    public function getPspPaymentData($tid) 
+    {
+        return $this->connector->doPspPaymentData($tid);
+        
+    }
 }
