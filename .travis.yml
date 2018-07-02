@@ -2,9 +2,6 @@ language: php
 
 php:
   - 7.0
-  - hhvm
-  - hhvm-3.24
-  - hhvm-nightly
 
 sudo: false
 
