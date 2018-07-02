@@ -2,7 +2,7 @@
 
 namespace Hoya\MasterpassBundle\Common;
 
-use Symfony\Bridge\Monolog\Logger;
+use Psr\Log\LoggerInterface;
 use Hoya\MasterpassBundle\Helper\MasterpassHelper;
 
 /**
@@ -10,8 +10,8 @@ use Hoya\MasterpassBundle\Helper\MasterpassHelper;
  *
  * @author Marcos Lazarin <marcoshoya at gmail dot com>
  */
-class Connector
-{
+class Connector {
+
     const AMP = '&';
     const QUESTION = '?';
     const EMPTY_STRING = '';
@@ -21,7 +21,6 @@ class Connector
     const COLON = ':';
     const SPACE = ' ';
     const UTF_8 = 'UTF-8';
-    const V1 = 'v1';
     const OAUTH_START_STRING = 'OAuth ';
     const REALM = 'realm';
     const ACCEPT = 'Accept';
@@ -33,12 +32,11 @@ class Connector
     const PKEY = 'pkey';
     const STRNATCMP = 'strnatcmp';
     const SHA1 = 'SHA1';
-    const APPLICATION_XML = 'application/xml; charset=utf-8;';
+    const APPLICATION_XML = 'application/json;';
     const AUTHORIZATION = 'Authorization';
     const OAUTH_BODY_HASH = 'oauth_body_hash';
     const BODY = 'body';
-    const MESSAGE = 'Message';
-
+    
     // Signature Base String
     const OAUTH_SIGNATURE = 'oauth_signature';
     const OAUTH_CONSUMER_KEY = 'oauth_consumer_key';
@@ -49,14 +47,7 @@ class Connector
     const OAUTH_SIGNATURE_METHOD = 'oauth_signature_method';
     const OAUTH_VERSION = 'oauth_version';
 
-    // Strings to detect errors in the service calls
-    const ERRORS_TAG = '<Errors>';
-    const HTML_TAG = '<html>';
-    const HTML_BODY_OPEN = '<body>';
-    const HTML_BODY_CLOSE = '</body>';
-
     //Connection Strings
-    const CONTENT_TYPE_APPLICATION_XML = 'Content-Type: application/xml';
     const SSL_ERROR_MESSAGE = 'SSL Error Code: %s %sSSL Error Message: %s';
 
     protected $urlService;
@@ -68,7 +59,7 @@ class Connector
     private $signatureMethod = 'RSA-SHA1';
     public $realm = 'eWallet'; // This value is static
     public $errorMessage = null;
-    
+
     /**
      * @var Symfony\Bridge\Monolog\Logger
      */
@@ -78,23 +69,12 @@ class Connector
      * @param URL   $url
      * @param array $keys
      */
-    public function __construct(Logger $logger, URL $url, array $keys)
+    public function __construct(LoggerInterface $logger, URL $url, array $keys)
     {
         $this->logger = $logger;
         $this->urlService = $url;
-        if ($this->urlService->isProduction()) {
-            $this->consumerKey = $keys['production']['consumerkey'];
-            $this->privateKey = new LocalPrivateKey(
-                $keys['production']['keystorepath'],
-                $keys['production']['keystorepassword']
-            );
-        } else {
-            $this->consumerKey = $keys['sandbox']['consumerkey'];
-            $this->privateKey = new LocalPrivateKey(
-                $keys['sandbox']['keystorepath'],
-                $keys['sandbox']['keystorepassword']
-            );
-        }
+        $this->consumerKey = $keys['consumerkey'];
+        $this->privateKey = new LocalPrivateKey($keys['keystorepath'], $keys['keystorepassword']);
     }
 
     /**
@@ -125,19 +105,11 @@ class Connector
     /**
      * @return string
      */
-    public function getOriginUrl()
-    {
-        return $this->urlService->getOriginUrl();
-    }
-
-    /**
-     * @return string
-     */
     public function getCallbackUrl()
     {
         return $this->urlService->getCallbackUrl();
     }
-    
+
     /**
      * Get logger
      * 
@@ -147,77 +119,22 @@ class Connector
     {
         return $this->logger;
     }
-
-    /**
-     * @param array       $params
-     * @param string|null $body
-     *
-     * @return string
-     */
-    public function doShoppingCart($params, $body)
-    {
-        return $this->doRequest($params, $this->urlService->getShoppingcartUrl(), self::POST, $body);
-    }
     
     /**
-     * Call Merchant Init service
+     * Decrypt API response
      * 
-     * @param array       $params
-     * @param string|null $body
-     *
-     * @return string
+     * @param string $content
+     * @return json|null
      */
-    public function doMerchantInit($params, $body)
+    public function decryptResponse($content)
     {
-        return $this->doRequest($params, $this->urlService->getMerchantInitUrl(), self::POST, $body);
-    }
+        $jweDecoded = \JOSE_JWT::decode ($content);
+        $jwe = $jweDecoded->decrypt($this->privateKey->getContents());
+        if ($jwe instanceof \JOSE_JWE) {
 
-    /**
-     * @param array       $params
-     * @param string|null $body
-     *
-     * @return string
-     */
-    public function doAccessToken($params)
-    {
-        return $this->doRequest($params, $this->urlService->getAccessUrl(), self::POST);
-    }
+            return $jwe->plain_text;
 
-    /**
-     * @param array       $params
-     * @param string|null $body
-     *
-     * @return string
-     */
-    public function doRequestToken($params, $body)
-    {
-        return $this->doRequest($params, $this->urlService->getRequestUrl(), self::POST, $body);
-    }
-
-    /**
-     * doCheckoutData.
-     *
-     * @param array  $params
-     * @param string $url
-     *
-     * @return string
-     */
-    public function doCheckoutData($params, $url)
-    {
-        return $this->doRequest($params, $url, self::GET);
-    }
-
-    /**
-     * doTransaction.
-     *
-     * @param array  $params
-     * @param string $body
-     *
-     * @return string
-     */
-    public function doTransaction($params, $body)
-    {
-        return $this->doRequest($params, $this->urlService->getTransactionUrl(), self::POST, $body);
+        }            
     }
 
     /**
@@ -237,11 +154,18 @@ class Connector
         if ($body !== null) {
             $params[self::OAUTH_BODY_HASH] = $this->generateBodyHash($body);
         }
-
+        
         try {
+            
             return $this->connect($params, $this->realm, $url, $requestMethod, $body);
+            
         } catch (\Exception $e) {
-            $this->errorMessage = $this->checkForErrors($e);
+            $this->getLogger()->error('Error on "{class}" while calling "{url}"', [
+                'class' => get_class(),
+                'url' => $url,
+                'error' => $e->getMessage()
+            ]);
+            throw new \Exception($e->getMessage());
         }
     }
 
@@ -280,11 +204,11 @@ class Connector
 
         $startString = self::OAUTH_START_STRING;
         if (!empty($realm)) {
-            $startString = $startString.self::REALM.self::EQUALS.self::DOUBLE_QUOTE.$realm.self::DOUBLE_QUOTE.self::COMMA;
+            $startString = $startString . self::REALM . self::EQUALS . self::DOUBLE_QUOTE . $realm . self::DOUBLE_QUOTE . self::COMMA;
         }
 
         foreach ($params as $key => $value) {
-            $startString = $startString.$key.self::EQUALS.self::DOUBLE_QUOTE.MasterpassHelper::RFC3986urlencode($value).self::DOUBLE_QUOTE.self::COMMA;
+            $startString = $startString . $key . self::EQUALS . self::DOUBLE_QUOTE . MasterpassHelper::RFC3986urlencode($value) . self::DOUBLE_QUOTE . self::COMMA;
         }
 
         $this->authHeader = substr($startString, 0, strlen($startString) - 1);
@@ -343,16 +267,16 @@ class Connector
         $url = MasterpassHelper::formatUrl($url, $params);
         $params = MasterpassHelper::parseUrlParameters($urlMap, $params);
 
-        $baseString = strtoupper($requestMethod).self::AMP.MasterpassHelper::RFC3986urlencode($url).self::AMP;
+        $baseString = strtoupper($requestMethod) . self::AMP . MasterpassHelper::RFC3986urlencode($url) . self::AMP;
         ksort($params);
 
         $parameters = self::EMPTY_STRING;
         foreach ($params as $key => $value) {
-            $parameters = $parameters.$key.self::EQUALS.MasterpassHelper::RFC3986urlencode($value).self::AMP;
+            $parameters = $parameters . $key . self::EQUALS . MasterpassHelper::RFC3986urlencode($value) . self::AMP;
         }
         $parameters = MasterpassHelper::RFC3986urlencode(substr($parameters, 0, strlen($parameters) - 1));
 
-        return $baseString.$parameters;
+        return $baseString . $parameters;
     }
 
     /**
@@ -397,17 +321,19 @@ class Connector
         $curl = curl_init($url);
 
         // Adds the CA cert bundle to authenticate the SSL cert
-        curl_setopt($curl, CURLOPT_CAINFO, __DIR__.self::SSL_CA_CER_PATH_LOCATION);
+        curl_setopt($curl, CURLOPT_CAINFO, __DIR__ . self::SSL_CA_CER_PATH_LOCATION);
 
         curl_setopt($curl, CURLOPT_RETURNTRANSFER, true);
         curl_setopt($curl, CURLOPT_SSL_VERIFYHOST, 2);
         curl_setopt($curl, CURLOPT_SSL_VERIFYPEER, false); // This should always be TRUE to secure SSL connections
 
-        curl_setopt($curl, CURLOPT_HTTPHEADER, array(
-            self::ACCEPT.self::COLON.self::SPACE.self::APPLICATION_XML,
-            self::CONTENT_TYPE.self::COLON.self::SPACE.self::APPLICATION_XML,
-            self::AUTHORIZATION.self::COLON.self::SPACE.$this->buildAuthHeaderString($params, $realm, $url, $requestMethod),
-        ));
+        $header = array(
+            self::ACCEPT . self::COLON . self::SPACE . self::APPLICATION_XML,
+            self::CONTENT_TYPE . self::COLON . self::SPACE . self::APPLICATION_XML,
+            self::AUTHORIZATION . self::COLON . self::SPACE . $this->buildAuthHeaderString($params, $realm, $url, $requestMethod),
+        );
+                
+        curl_setopt($curl, CURLOPT_HTTPHEADER, $header);
 
         if ($requestMethod == self::GET) {
             curl_setopt($curl, CURLOPT_HTTPGET, true);
@@ -416,10 +342,15 @@ class Connector
             curl_setopt($curl, CURLOPT_POSTFIELDS, $body);
         }
 
-        $this->getLogger()->debug("[Hoya\MasterpassBundle\Common\Connector] calling {$url}");
-        $this->getLogger()->debug("[Hoya\MasterpassBundle\Common\Connector] body content: {$body}");
-        
+        if ($body !== null) {
+            $this->getLogger()->debug("Sending body content", ['content' => $body]);
+        }
+
         $result = curl_exec($curl);
+        $httpCode = curl_getinfo($curl, CURLINFO_HTTP_CODE);
+        
+        $this->getLogger()->debug('Calling "{url}"', ['url' => $url, 'header' => $header]);
+        $this->getLogger()->info('HTTP Response code "{code}" from "{url}"', ['url' => $url, 'code' => $httpCode]);
         
         // Check if any error occurred
         if (curl_errno($curl)) {
@@ -427,28 +358,111 @@ class Connector
         }
 
         // Check for errors and throw an exception
-        if (($errorCode = curl_getinfo($curl, CURLINFO_HTTP_CODE)) > 300) {
-            throw new \Exception($result, $errorCode);
+        if ($httpCode > 300) {
+            throw new \Exception($result, $httpCode);
         }
+        
+        $this->getLogger()->debug('Response from "{class}"', ['class' => get_class(), 'response' => $result]);
 
         return $result;
     }
+    
+    /**
+     * doPaymentData call
+     * 
+     * @param string        $tid
+     * @param string|null  $cartid
+     * @param string       $checkoutid
+     *
+     * @return string
+     */
+    public function doPaymentData($tid, $cartid, $checkoutid)
+    {
+        $params = [];
+        $url = $this->urlService->getPaymentdataUrl($tid, $cartid, $checkoutid);
+                
+        return $this->doRequest($params, $url, self::GET);
+    }
+    
+    /**
+     * doTransaction.
+     *
+     * @param array  $params
+     * @param string $body
+     *
+     * @return string
+     */
+    public function doTransaction($params, $body)
+    {
+        return $this->doRequest($params, $this->urlService->getTransactionUrl(), self::POST, $body);
+    }
+    
+    /**
+     * doPaymentData call
+     * 
+     * @param string        $tid
+     * @param string|null  $cartid
+     * @param string       $checkoutid
+     *
+     * @return string
+     */
+    public function doEncryptedData($tid, $cartid, $checkoutid)
+    {
+        $params = [];
+        $url = $this->urlService->getEncryptedUrl($tid, $cartid, $checkoutid);
+                
+        return $this->doRequest($params, $url, self::GET);
+    }
 
     /**
-     * Method to check for HTML content in the exception message and remove everything except the body.
+     * doPaymentData call
+     * 
+     * @param string        $tid    pairing token from callback
+     * @param string|null   $userId
      *
-     * @param \Exception $e
-     *
-     * @return \Exception
+     * @return string
      */
-    private function checkForErrors(\Exception $e)
+    public function doPairingData($tid, $userId)
     {
-        if (strpos($e->getMessage(), self::HTML_TAG) !== false) {
-            $body = substr($e->getMessage(), strpos($e->getMessage(), self::HTML_BODY_OPEN) + 6, strpos($e->getMessage(), self::HTML_BODY_CLOSE));
-
-            return $body;
-        } else {
-            return MasterpassHelper::formatXML($e->getMessage());
-        }
+        $params = [];
+        $url = $this->urlService->getPairingUrl($tid, $userId);
+                
+        return $this->doRequest($params, $url, self::GET);
+    }
+    
+    public function doPrecheckoutData($pairingId)
+    {
+        $params = [];
+        $url = $this->urlService->getPrecheckoutUrl($pairingId);
+                
+        return $this->doRequest($params, $url, self::GET);
+    }
+    
+    /**
+     * doExpressCheckout
+     *
+     * @param array  $params
+     * @param string $body
+     *
+     * @return string
+     */
+    public function doExpressCheckout($params, $body)
+    {
+        return $this->doRequest($params, $this->urlService->getExpressUrl(), self::POST, $body);
+    }
+    
+    /**
+     * doPspPaymentData call
+     * 
+     * @param string        $tid
+     *
+     * @return string
+     */
+    public function doPspPaymentData($tid)
+    {
+        $params = [];
+        $url = $this->urlService->getPspPaymentdataUrl($tid);
+                
+        return $this->doRequest($params, $url, self::GET);
     }
 }

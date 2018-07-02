@@ -9,13 +9,14 @@ namespace Hoya\MasterpassBundle\Common;
  */
 class URL
 {
-    const REQUESTURL = 'api.mastercard.com/oauth/consumer/v1/request_token';
-    const SHOPPINGCARTURL = 'api.mastercard.com/masterpass/v6/shopping-cart';
-    const ACCESSURL = 'api.mastercard.com/oauth/consumer/v1/access_token';
-    const POSTBACKURL = 'api.mastercard.com/masterpass/v6/transaction';
-    const PRECHECKOUTURL = 'api.mastercard.com/masterpass/v6/precheckout';
-    const MERCHANTINITURL = 'api.mastercard.com/masterpass/v6/merchant-initialization';
-    const LIGHTBOXURL = 'masterpass.com/lightbox/Switch/integration/MasterPass.client.js';
+    const PAYMENTDATAURL = 'api.mastercard.com/masterpass/paymentdata';
+    const POSTBACKURL = 'api.mastercard.com/masterpass/postback';
+    const LIGHTBOXURL = 'masterpass.com/integration/merchant.js';
+    const ENCRYPTEDURL = 'api.mastercard.com/masterpass/encrypted-paymentdata';
+    const PAIRINGURL = 'api.mastercard.com/masterpass/pairingid';
+    const PRECHECKOUTURL = 'api.mastercard.com/masterpass/precheckoutdata';
+    const EXPRESSURL = 'api.mastercard.com/masterpass/expresscheckout';
+    const PSPDATAURL = 'api.mastercard.com/masterpass/psp-paymentdata';
 
     /**
      * @var bool
@@ -26,22 +27,16 @@ class URL
      * @var string
      */
     private $callback;
-    
-    /**
-     * @var string
-     */
-    private $originUrl;
 
     /**
      * @param bool   $productionMode
      * @param string $callback
      * @param string $originUrl
      */
-    public function __construct($productionMode, $callback, $originUrl = null)
+    public function __construct($productionMode, $callback)
     {
         $this->productionMode = $productionMode;
         $this->callback = $callback;
-        $this->originUrl = $originUrl;
     }
 
     /**
@@ -65,64 +60,6 @@ class URL
     }
 
     /**
-     * Get request-token Url.
-     *
-     * @return string
-     */
-    public function getRequestUrl()
-    {
-        return $this->buildUrl(self::REQUESTURL);
-    }
-
-    /**
-     * Get shopping-cart Url.
-     *
-     * @return string
-     */
-    public function getShoppingcartUrl()
-    {
-        return $this->buildUrl(self::SHOPPINGCARTURL);
-    }
-
-    /**
-     * @return string
-     */
-    public function getAccessUrl()
-    {
-        return $this->buildUrl(self::ACCESSURL);
-    }
-
-    /**
-     * Get merchant initialization url.
-     *
-     * @return string
-     */
-    public function getMerchantInitUrl()
-    {
-        return $this->buildUrl(self::MERCHANTINITURL);
-    }
-
-    /**
-     * Get transaction url.
-     *
-     * @return string
-     */
-    public function getPrecheckoutUrl()
-    {
-        return $this->buildUrl(self::PRECHECKOUTURL);
-    }
-
-    /**
-     * Get transaction url.
-     *
-     * @return string
-     */
-    public function getTransactionUrl()
-    {
-        return $this->buildUrl(self::POSTBACKURL);
-    }
-
-    /**
      * Get lightbox url.
      *
      * @return string
@@ -130,18 +67,6 @@ class URL
     public function getLightboxUrl()
     {
         return $this->buildUrl(self::LIGHTBOXURL);
-    }
-
-    /**
-     * @return string
-     */
-    public function getOriginUrl()
-    {
-        if (null == $this->originUrl) {
-            return 'http://localhost';
-        }
-        
-        return $this->originUrl;
     }
 
     /**
@@ -154,5 +79,100 @@ class URL
     private function buildUrl($url)
     {
         return $this->productionMode ? sprintf('https://%s', $url) : sprintf('https://sandbox.%s', $url);
+    }
+    
+    /**
+     * Get payment data url
+     * 
+     * @param string $tid
+     * @param string $cartid
+     * @param string $checkoutid
+     * 
+     * @return string
+     */
+    public function getPaymentdataUrl($tid, $cartid, $checkoutid)
+    {
+        $url = $this->buildUrl(self::PAYMENTDATAURL);
+        
+        return sprintf('%s/%s?checkoutId=%s&cartId=%s', $url, $tid, $checkoutid, $cartid);
+    }
+    
+    /**
+     * Get postback url
+     * 
+     * @return string
+     */
+    public function getTransactionUrl()
+    {
+        return $this->buildUrl(self::POSTBACKURL);
+    }
+    
+    /**
+     * Get encrypted data url
+     * 
+     * @param string $tid
+     * @param string $cartid
+     * @param string $checkoutid
+     * 
+     * @return string
+     */
+    public function getEncryptedUrl($tid, $cartid, $checkoutid)
+    {
+        $url = $this->buildUrl(self::ENCRYPTEDURL);
+        
+        return sprintf('%s/%s?checkoutId=%s&cartId=%s', $url, $tid, $checkoutid, $cartid);
+    }
+    
+    /**
+     * Get pairing url
+     * 
+     * @param string $tid
+     * @param string $userId
+     * 
+     * @return string
+     */
+    public function getPairingUrl($tid, $userId)
+    {
+        $url = $this->buildUrl(self::PAIRINGURL);
+        
+        return sprintf('%s?pairingTransactionId=%s&userId=%s', $url, $tid, $userId);
+    }
+    
+    /**
+     * Get precheckout url
+     * 
+     * @param string $tid
+     * 
+     * @return string
+     */
+    public function getPrecheckoutUrl($tid)
+    {
+        $url = $this->buildUrl(self::PRECHECKOUTURL);
+        
+        return sprintf('%s/%s', $url, $tid);
+    }
+    
+    /**
+     * Get express url
+     * 
+     * @return string
+     */
+    public function getExpressUrl()
+    {
+        return $this->buildUrl(self::EXPRESSURL);
+    }
+    
+    /**
+     * Get psp payment data url
+     * 
+     * @param string $tid
+     * 
+     * @return string
+     */
+    public function getPspPaymentdataUrl($tid)
+    {
+        $url = $this->buildUrl(self::PSPDATAURL);
+        
+        return sprintf('%s/%s', $url, $tid);
     }
 }
